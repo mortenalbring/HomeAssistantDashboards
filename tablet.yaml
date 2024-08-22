@@ -1,0 +1,739 @@
+button_card_templates:
+  heatmap_key:
+    custom_fields:
+      key1: |
+        [[[          
+            if (states['input_select.tablet_display_type'].state == 'Heatmap') {                
+                  return `<span>10 °C</span>`
+            }         
+            if (states['input_select.tablet_display_type'].state == 'Humiditymap') {
+                  return `<span>10%</span>`
+            }           
+        ]]]
+      key2: |
+        [[[
+            if (states['input_select.tablet_display_type'].state == 'Heatmap') {                
+                  return `<span>13 °C</span>`
+            }         
+            if (states['input_select.tablet_display_type'].state == 'Humiditymap') {
+                  return `<span>30%</span>`
+            }           
+
+        ]]]
+      key3: |
+        [[[
+            if (states['input_select.tablet_display_type'].state == 'Heatmap') {                
+                  return `<span>16 °C</span>`
+            }         
+            if (states['input_select.tablet_display_type'].state == 'Humiditymap') {
+                  return `<span>50%</span>`
+            }           
+
+        ]]]
+      key4: |
+        [[[
+            if (states['input_select.tablet_display_type'].state == 'Heatmap') {                
+                  return `<span>19 °C</span>`
+            }         
+            if (states['input_select.tablet_display_type'].state == 'Humiditymap') {
+                  return `<span>70%</span>`
+            }           
+
+        ]]]
+      key5: |
+        [[[
+            if (states['input_select.tablet_display_type'].state == 'Heatmap') {                
+                  return `<span>23 °C</span>`
+            }         
+            if (states['input_select.tablet_display_type'].state == 'Humiditymap') {
+                  return `<span>90%</span>`
+            }           
+
+        ]]]
+    styles:
+      grid:
+        - grid-template-areas: '"key1" "key2" "key3" "key4" "key5"'
+        - grid-template-columns: 1fr
+        - grid-template-rows: repeat(5,1fr)
+        - grid-column-gap: 0px
+        - grid-row-gap: 0px
+      custom_fields:
+        key1:
+          - color: white
+          - font-size: 0.4em
+          - background: rgba(10,10,10,0.5)
+        key2:
+          - color: white
+          - font-size: 0.4em
+          - background: rgba(10,10,10,0.5)
+        key3:
+          - color: white
+          - font-size: 0.4em
+          - background: rgba(10,10,10,0.5)
+        key4:
+          - color: white
+          - font-size: 0.4em
+          - background: rgba(10,10,10,0.5)
+        key5:
+          - color: white
+          - font-size: 0.4em
+          - background: rgba(10,10,10,0.5)
+      card:
+        - background: |
+            [[[              
+                  if (states['input_select.tablet_display_type'].state == 'Heatmap') {                
+                    var output = "linear-gradient(";
+                    let c = 0;
+                    while(c < 5) {      
+                     let hval = 221 - ( 221 * (c / 5));                               
+                     output = output + "hsla(" + hval + ",100%,50%,0.8),";
+                     c++;
+                    }
+                    output = output + "hsla(0,100%,50%,0.8))";                            
+                    return output;
+                  }         
+
+
+                  if (states['input_select.tablet_display_type'].state == 'Humiditymap') {
+                    var output = "linear-gradient(";
+                    let c = 0;
+                    while(c < 5) {      
+                     let percentKey = (c/5);
+                     
+                     let hval = 20 + ( 244 * ( percentKey ) );  
+                     console.log("percentKey",percentKey,"hval",hval);
+                     
+                     output = output + "hsla(" + hval + ",60%,50%,0.9),";
+                     c++;
+                    }
+                    output = output + "hsla(264,60%,50%,0.9))";                            
+                    return output;                  
+                  }                
+
+            ]]]
+  heatmap_room_entities:
+    tap_action:
+      action: more-info
+    custom_fields:
+      temp_display: |
+        [[[ 
+          let text = '';
+          let ftext = '';
+          let t = entity.state;      
+          if (entity.state === 'heat') {
+            t = entity.attributes.current_temperature
+          }          
+          text = parseInt(t) + '°C';
+          
+
+          if (variables.humidity_entity) {
+            ftext = parseInt(variables.humidity_entity) + '%';            
+          }
+          
+         if (states['input_select.tablet_display_type'].state == 'Heatmap') {                
+                  return `<span>` + text + `</span>`
+         }         
+         if (states['input_select.tablet_display_type'].state == 'Humiditymap') {
+                 return `<span>` + ftext + `</span>`
+         }           
+                   
+          return `<span>` + text + `</span>`;
+        ]]]
+    variables:
+      humidity_entity: null
+      extra_entities: null
+    styles:
+      grid:
+        - grid-template-areas: '"i" "temp_display"'
+        - grid_template-columns: 20% 1fr;
+        - grid-template-rows: 50% auto;
+      custom_fields:
+        temp_display:
+          - font-size: 0.9em
+          - font-weight: 800;
+          - color: white;
+          - text-shadow: 5px 1px 5px black;
+      card:
+        - border-radius: 5px
+        - border: |
+            [[[
+              if (variables.outdoor) { return 0; }
+              return 2;
+
+            ]]]
+        - background: |
+            [[[  
+                function getHslFromTemp(t, opacity) {                       
+                   let tempMax = 25;                 
+                   let tempMin = 10;
+                   
+                   if (t > tempMax) { t = tempMax; }
+                   if (t < tempMin) { t = tempMin; }
+                   let percentTemp = (t - tempMin) / (tempMax - tempMin);                   
+                   let hval = 221 - (221 * percentTemp);
+                   let hsl = "hsla(" + hval + ",100%,50%," + opacity + ")";
+                   return hsl;                   
+                }  
+                function getHslFromHumidity(h, opacity) {                       
+                   let humidityMax = 100;                 
+                   let humidityMin = 0;                   
+                   let percentHumid = (h - humidityMin) / (humidityMax - humidityMin);                                      
+                   
+                   let hval = 20 + (244 * (percentHumid));                   
+                   let hsl = "hsla(" + hval + ",60%,50%," + opacity + ")";                   
+                   return hsl;                   
+                }  
+                
+                
+                function getHumidityMapGradient() {
+                  var humidityGradientOutput = "rgba(200,200,200,0.0)";
+
+                  if (variables.humidity_entity) {
+                    let hsl = getHslFromHumidity(variables.humidity_entity,0.8);
+                    let end = "rgba(255,255,255,0.0)";
+                    let radialGradient = "radial-gradient(closest-corner," + hsl + " 50%," + end + ")";                            
+                   if (variables.outdoor) {                   
+                     return "radial-gradient(closest-side," + hsl + " 50%," + end + ")";          
+                   }
+                    
+                    humidityGradientOutput = radialGradient;                    
+                  }
+
+                  return humidityGradientOutput;
+                }
+
+                function getHeatmapGradient() {
+                   let t = entity.state;      
+                   if (entity.state === 'heat') { t = entity.attributes.current_temperature; }                 
+                   let hsl = getHslFromTemp(t, 0.5);
+                   let end = "rgba(255,255,255,0.0)";
+                   let radialGradient = "radial-gradient(farthest-corner," + hsl + " 80%," + end + ")";          
+                   let output = radialGradient;
+
+                   if (variables.outdoor) {                   
+                   return "radial-gradient(closest-side," + hsl + " 50%," + end + ")";          
+                   }
+                   if (variables.extra_entities) {              
+                     variables.extra_entities.forEach((elem) => {                     
+                       if (elem.value && !isNaN(elem.value)) {
+                       let t = elem.value;
+                       if (elem.offset) {
+                          t = parseFloat(t) + parseFloat(elem.offset);                          
+                       }                     
+                       let hsl2 = getHslFromTemp(parseFloat(t), 0.5);
+                       let radialGradient2 = "radial-gradient(at " + elem.x + "% " + elem.y + "%," + hsl2 + " 5%," + end + " 30%)";          
+                       output = radialGradient2 + "," + output;                    
+                       }
+                     })
+                  }
+                  return output;
+                }
+
+                var tabletDisplayType = states['input_select.tablet_display_type'].state;                
+                var output = "rgba(200,200,200,0.0)";
+
+                if (tabletDisplayType == 'Heatmap') {                
+                  output = getHeatmapGradient();
+                }         
+                if (tabletDisplayType == 'Humiditymap') {
+                  output = getHumidityMapGradient();            
+                }                
+                                                   
+                 return output;
+            ]]]
+      name:
+        - display: none
+      icon:
+        - display: true
+        - color: rgba(255,255,255,0.8)
+        - min-width: 2em
+        - max-height: 2em
+        - float: true
+  heatmap_room_overview:
+    template: heatmap_room_entities
+    tap_action:
+      action: call-service
+      service: script.tablet_toggle_display_mode
+    custom_fields: null
+    variables:
+      humidity_entity: null
+      extra_entities: null
+    styles:
+      custom_fields:
+        temp_display:
+          - font-size: 0.1em
+          - font-weight: 800;
+          - color: black;
+          - text-shadow: 5px 1px 5px black;
+      card:
+        - border-radius: 1px
+        - opacity: 0.5
+        - border: |
+            [[[
+              if (variables.outdoor) { return 0; }
+              return 2;
+            ]]]      
+      name:
+        - display: none
+      icon:
+        - display: false
+        - color: rgba(255,255,255,0.0)
+        - min-width: 2em
+        - max-height: 2em
+        - float: true
+views:
+  - theme: Tablet
+    type: panel
+    title: Tablet
+    badges: []
+    cards:
+      - type: picture-elements
+        image: /local/fp_both_blank.png
+        elements:
+          - type: custom:apexcharts-card
+            apex_config:
+              chart:
+                height: 170px
+                width: 450px
+            style:
+              top: 230px
+              left: 220px
+            header:
+              show: false
+              title: Octopus Future Price
+            series:
+              - entity: >-
+                  event.octopus_energy_electricity_18p2053324_1414550002006_current_day_rates
+                offset: '-15m'
+                type: column
+                unit: p/kWh
+                float_precision: 3
+                stroke_width: -5
+                extend_to: end
+                name: Today
+                yaxis_id: first
+                color_threshold:
+                  - value: 0
+                    color: blue
+                  - value: 5
+                    color: lightgreen
+                    opacity: 0.1
+                  - value: 15
+                    color: green
+                    opacity: 0.1
+                  - value: 20
+                    color: orange
+                    opacity: 0.1
+                  - value: 30
+                    color: red
+                data_generator: |
+                  return entity.attributes.rates.map((entry) => {
+                    return [new Date(entry.start), entry.value_inc_vat*100];
+                  });
+            yaxis:
+              - min: ~0
+                max: ~30
+                id: first
+                decimals: 0
+                apex_config:
+                  tickAmount: 3
+                show: true
+              - id: second
+                show: false
+                opposite: true
+                min: 0
+                max: 100
+              - id: third
+                show: false
+                opposite: true
+                min: 0
+                max: 1000
+            graph_span: 24h
+            span:
+              start: day
+              offset: +1h
+            experimental:
+              color_threshold: true
+          - type: custom:apexcharts-card
+            apex_config:
+              chart:
+                height: 170px
+                width: 450px
+            style:
+              top: 70px
+              left: 220px
+            header:
+              show: false
+              title: Octopus Future Price
+            series:
+              - entity: sensor.lux_battery
+                color: blue
+                type: area
+                opacity: 0.9
+                yaxis_id: second
+                extend_to: false
+                name: Battery
+                group_by:
+                  func: avg
+                  duration: 5min
+              - entity: sensor.lux_solar_output_live
+                type: area
+                color: yellow
+                opacity: 0.9
+                yaxis_id: third
+                extend_to: false
+                name: Solar
+                group_by:
+                  func: avg
+                  duration: 5min
+              - entity: sensor.lux_home_consumption_live
+                type: area
+                color: purple
+                opacity: 0.9
+                yaxis_id: third
+                extend_to: false
+                name: Consumption
+                group_by:
+                  func: avg
+                  duration: 5min
+            yaxis:
+              - id: second
+                min: 0
+                max: 100
+                opposite: true
+                show: false
+                decimals: 0
+                apex_config:
+                  tickAmount: 3
+              - id: third
+                show: true
+                opposite: false
+                min: ~0
+                max: ~2000
+                decimals: 0
+                apex_config:
+                  tickAmount: 3
+            graph_span: 24h
+            span:
+              start: day
+              offset: +1h
+            experimental:
+              color_threshold: true
+          - type: custom:button-card
+            template:
+              - heatmap_room_overview
+            entity: sensor.oppe_gjennomsnitt_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.oppe_gjennomsnitt_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 245px
+                - height: 265px
+            style:
+              top: 455px
+              left: 180px
+          - type: custom:button-card
+            template:
+              - heatmap_room_overview
+            entity: sensor.nede_gjennomsnitt_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.nede_gjennomsnitt_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 280px
+                - height: 225px
+            style:
+              top: 430px
+              left: 635px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.kjoekken_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.kjoekken_fuktighet'].state
+                ]]]     
+              extra_entities: |
+                [[[                  
+                  var entityOne = {entityId: 'climate.wiser_kitchen', value: states['climate.wiser_kitchen'].attributes.current_temperature, x: '30', y: '5'};
+                  var entityTwo = {entityId: 'sensor.kjoekken_temperatur', value: states['sensor.kjoekken_temperatur'].state, x: '90', y: '90'}; 
+                  var entityThree = {entityId: 'sensor.kjoekken_bevegelsessensor_temperatur', value: states['sensor.kjoekken_bevegelsessensor_temperatur'].state, x: '80', y: '80'};
+                  return [ entityOne, entityTwo, entityThree];
+                ]]]                 
+            style:
+              top: 530px
+              left: 355px
+            styles:
+              card:
+                - width: 100px
+                - height: 130px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.stoppekran_vanndetektor_temperatur
+            variables: null
+            style:
+              top: 475px
+              left: 80px
+            styles:
+              card:
+                - width: 50px
+                - height: 70px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.zone_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.zone_fuktighet'].state
+                ]]]            
+              extra_entities: |
+                [[[                  
+                  var entityOne = {entityId: 'sensor.zone_temperatur', value: states['sensor.zone_temperatur'].state, x: '50', y: '50'};
+                  var entityTwo = {entityId: 'sensor.grace_gputemperature', value: states['sensor.grace_gputemperature'].state, x: '10', y: '10'};
+                  var entityThree = {entityId: 'sensor.kontor_bevegelsessensor_temperatur', value: states['sensor.kontor_bevegelsessensor_temperatur'].state, offset: -5, x: '50', y: '2'};
+                  return [ entityOne, entityTwo, entityThree];
+                ]]]            
+            style:
+              top: 475px
+              left: 155px
+            styles:
+              card:
+                - width: 100px
+                - height: 70px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.garasje_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.garasje_fuktighet'].state
+                ]]]               
+            style:
+              top: 550px
+              left: 160px
+            styles:
+              card:
+                - width: 200px
+                - height: 80px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.soverom_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.soverom_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 140px
+                - height: 80px
+            style:
+              top: 360px
+              left: 710px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.gjesterom_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.gjesterom_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 140px
+                - height: 80px
+            style:
+              top: 360px
+              left: 570px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.baderom_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.baderom_fuktighet'].state
+                ]]]
+            extra_entities: |
+              [[[                                  
+                var entityOne = {entityId: 'climate.wiser_bathroom', value: states['climate.wiser_bathroom'].attributes.current_temperature, x: '50', y: '80'};                  
+                return [ entityOne ];
+              ]]]                
+            styles:
+              card:
+                - width: 100px
+                - height: 90px
+            style:
+              top: 500px
+              left: 635px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.kontor_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.kontor_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 90px
+                - height: 145px
+            style:
+              top: 473px
+              left: 732px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.batteriskap_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.batteriskap_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 70px
+                - height: 50px
+            style:
+              top: 425px
+              left: 535px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.gjallarhorn_temperature
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.gjallarhorn_humidity'].state
+                ]]]              
+              extra_entities: |
+                [[[
+                  var entityOne = {entityId: 'sensor.vindfang_temperatur', value: states['sensor.vindfang_temperatur'].state, x: '-20', y: '50'};                  
+                  var entityTwo = {entityId: 'sensor.gjallarhorn_temperature', value: states['sensor.gjallarhorn_temperature'].state, x: '40', y: '50'};                  
+                  var entityThree = {entityId: 'climate.wiser_hallway', value: states['climate.wiser_hallway'].attributes.current_temperature, x: '50', y: '5'};                  
+                  return [ entityOne, entityTwo, entityThree ];
+                ]]]
+                        
+            styles:
+              card:
+                - width: 150px
+                - height: 40px
+            style:
+              top: 420px
+              left: 130px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: climate.wiser_dining_room
+            styles:
+              card:
+                - width: 100px
+                - height: 110px
+            style:
+              top: 455px
+              left: 255px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.awair_lr_humid'].state
+                ]]]              
+              extra_entities: |
+                [[[
+                  var entityOne = {entityId: 'climate.wiser_living_room', value: states['climate.wiser_living_room'].attributes.current_temperature, x: '5', y: '50'};
+                  var entityTwo = {entityId: 'sensor.awair_lr_temp', value: states['sensor.awair_lr_temp'].state, x: '70', y: '50'};                  
+                  return [ entityOne, entityTwo];
+                ]]]
+            entity: sensor.awair_lr_temp
+            icon: mdi:sofa
+            styles:
+              card:
+                - width: 250px
+                - height: 80px
+            style:
+              top: 360px
+              left: 180px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.hage_bak_temperatur
+            variables:
+              outdoor: true
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.hage_bak_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 150px
+                - height: 150px
+            style:
+              top: 385px
+              left: 350px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.vindfang_temperatur
+            variables:
+              outdoor: true
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.vindfang_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 80px
+                - height: 80px
+            style:
+              top: 380px
+              left: 30px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.kjoleskap_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.kjoleskap_fuktighet'].state
+                ]]]              
+            styles:
+              card:
+                - width: 45px
+                - height: 80px
+            style:
+              top: 550px
+              left: 280px
+          - type: custom:button-card
+            template: heatmap_room_entities
+            entity: sensor.verksted_temperatur
+            variables:
+              humidity_entity: |
+                [[[ 
+                  return states['sensor.verksted_fuktighet'].state
+                ]]]
+            style:
+              top: 540px
+              left: 880px
+            styles:
+              card:
+                - width: 100px
+                - height: 100px
+
+          - type: custom:webrtc-camera
+            style:
+                    top: 150px
+                    left: 740px
+                    width: 400px          
+            url: rtsp://homeass:homeass@192.168.1.165:554/stream1
+            ui: false
+            muted: false
+            digital_ptz:
+              mouse_drag_pan: true
+              mouse_wheel_zoom: true
+              mouse_double_click_zoom: true
+              touch_drag_pan: true
+              touch_pinch_zoom: true
+              touch_tap_drag_zoom: true
+              persist: true
+        
+         
