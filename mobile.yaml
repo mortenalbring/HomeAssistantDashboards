@@ -1,0 +1,1230 @@
+button_card_templates:
+  inlinecard:
+    styles:
+      state:
+        - text-align: left
+        - width: 100%
+        - font-size: 11px
+        - font-weight: bold
+      name:
+        - text-align: left
+        - font-size: 11px
+        - width: 100%
+      card:
+        - height: 100%;
+        - background: rgba(20,20,20,0.3);
+      grid:
+        - grid-template-areas: '"i n n" "i s s"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+  solarcard:
+    show_state: true
+    styles:
+      card:
+        - background: rgba(156,104,0,0.4);
+        - border: 0
+        - padding: 0
+      grid:
+        - grid-template-areas: '"solar battery consumption"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+        - gap: 2px 0px
+      solar:
+        - grid-area: 1 / 2 / 2 / 3
+      battery:
+        - grid-area: 1 / 3 / 2 / 4;
+      consumption:
+        - grid-area: 1 / 3 / 2 / 4;
+    custom_fields:
+      solar:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: true
+          icon: mdi:sun-wireless
+          name: Solar
+          entity: sensor.lux_solar_output_live
+      battery:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: true
+          name: Battery
+          entity: sensor.lux_battery
+      consumption:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: true
+          name: Consumption
+          entity: sensor.lux_home_consumption_live
+  aqicard:
+    show_state: true
+    styles:
+      card:
+        - background: rgba(73, 185, 230,0.5);
+        - border: 0
+        - padding: 0
+      grid:
+        - grid-template-areas: '"score c02 tvoc pm25"'
+        - grid-template-columns: 1fr 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+        - gap: 2px 0px
+      solar:
+        - grid-area: 1 / 2 / 2 / 3
+      battery:
+        - grid-area: 1 / 3 / 2 / 4;
+      consumption:
+        - grid-area: 1 / 3 / 2 / 4;
+    custom_fields:
+      score:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: true
+          icon: mdi:percent
+          name: Air
+          entity: sensor.awair_lr_score
+      c02:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: true
+          name: CO2
+          entity: sensor.awair_lr_co2
+      tvoc:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: true
+          name: VOC
+          entity: sensor.awair_lr_voc
+      pm25:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: true
+          name: PM 2.5
+          entity: sensor.awair_lr_pm25
+  roomcard_tinystate:
+    show_state: false
+    show_icon: false
+    show_name: false
+    size: 100%
+    tap_action: none
+    hold_action: none
+    double_tap_action: none
+    variables:
+      compact_mode: false
+    custom_fields:
+      ss: |
+        [[[            
+            let unitOfMeasurement = entity.attributes?.unit_of_measurement;            
+            let output = parseInt(entity.state);
+            let icon = 'mdi:thermometer';            
+            if (entity.attributes?.device_class == 'humidity') {
+               icon = 'mdi:water';              
+            }
+            if (entity.attributes?.device_class == 'temperature') {
+               icon = 'mdi:thermometer';
+            }            
+            let size = '15px';
+            if (variables.compact_mode) {
+              size = '10px';  
+              unitOfMeasurement = '';
+            }
+            
+            let content = `<div><ha-icon icon=${icon} style="width:${size}; height: ${size}; color: white;"></ha-icon><span>${output} ${unitOfMeasurement}</span></div>`
+            return content;                  
+        ]]]      
+    styles:
+      grid:
+        - grid-template-areas: '"ss"'
+        - grid-template-columns: 1fr
+        - grid-template-rows: 1fr
+      custom_fields:
+        ss:
+          - font-size: |
+              [[[
+                if (variables.compact_mode) {
+                  return '10px';
+                }
+                return '12px';                    
+              ]]]
+          - text-align: center;
+          - display: flex
+          - align-items: center
+          - width: 100%;
+          - height: 100%;
+          - margin-top: 1em
+          - margin-bottom: 1em
+          - margin-left: 1em
+          - margin-right: 1em
+      card:
+        - height: 100%;
+        - border: 0
+        - text-align: center
+        - height: 100%
+        - background: >
+            [[[                
+
+            function convertRange(value,r1,r2) { return
+            (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];} 
+
+            let hState = entity.state;                                 let min =
+            50; let max = 100;             if (entity.attributes?.device_class
+            == 'humidity') {
+              min = 50;
+              max = 100;
+            } if (entity.attributes?.device_class == 'temperature') {
+              min = 15;
+              max = 30;
+            }
+                    
+            let hValPercent =
+            convertRange(hState,[min,max],[0,1]);                                
+
+            let hHsla =
+            `hsla(21,${hValPercent*100}%,39%,${hValPercent})`;                                                       
+
+            let gradient2 = `radial-gradient(ellipse closest-side at center,
+            ${hHsla} 60%,transparent 100%)`;
+
+            return gradient2;   ]]]
+  roomcardnav:
+    icon: |
+      [[[
+        return variables.icon;
+      ]]]
+    tap_action:
+      action: navigate
+      navigation_path: |
+        [[[
+          return variables.navhash;
+        ]]]
+    variables:
+      onoff: ''
+      navhash: ''
+      icon: ''
+    size: 100%
+    styles:
+      icon:
+        - transform: scale(0.4)
+        - font-size: 2px !important;
+        - color: >
+            [[[ if (states[variables.onoff]?.state == 'on') { return
+            'rgba(30,30,30,0.95)'; }
+              else { return 'rgba(20,20,20,0.5)'; }
+            ]]]                     
+      card:
+        - border-radius: 20px
+        - filter: drop-shadow(0 0 1.0rem rgb(243,156,15))
+        - font-size: 10px
+        - background: >
+            [[[ if (states[variables.onoff]?.state == 'on') { return
+            'rgba(200,200,22,0.5)'; }
+              else { return 'rgba(20,20,20,0.2)'; }
+            ]]]
+  roomcard2:
+    tap_action:
+      action: navigate
+      navigation_path: |
+        [[[
+          return variables.room_hash;
+        ]]]
+    custom_fields:
+      btn1:
+        card:
+          type: custom:button-card
+          triggers_update: |
+            [[[ return variables.btn1_onoff; ]]]
+          template: roomcardnav
+          variables:
+            onoff: |
+              [[[ return variables.btn1_onoff; ]]]
+            navhash: |
+              [[[ return variables.btn1_hash; ]]]
+            icon: |
+              [[[ return variables.btn1_icon; ]]]
+      btn2:
+        card:
+          type: custom:button-card
+          template: roomcardnav
+          variables:
+            onoff: |
+              [[[ return variables.btn2_onoff; ]]]          
+            navhash: |
+              [[[ return variables.btn2_hash; ]]]
+            icon: |
+              [[[ return variables.btn2_icon; ]]]                              
+      tempcard:
+        card:
+          type: custom:button-card
+          template: roomcard_tinystate
+          icon: mdi:thermometer
+          entity: |
+            [[[
+              return variables.temperature_entity;  
+            ]]]
+      fuktcard:
+        card:
+          type: custom:button-card
+          template: roomcard_tinystate
+          icon: mdi:water
+          entity: |
+            [[[
+              return variables.humidity_entity;  
+            ]]]
+    variables:
+      temperature_entity: null
+      humidity_entity: null
+      motion_entity: null
+      btn1_hash: null
+      btn1_onoff: null
+      btn2_hash: null
+      btn2_onoff: null
+      room_hash: ''
+      other: |
+        [[[ return ""; ]]]
+          
+    styles:
+      custom_fields:
+        other:
+          - padding: 20px
+          - border: 0 !important
+        tempcard:
+          - height: 100%
+          - width: 100%
+          - display: flex
+          - align-items: center
+          - justify-content: center
+        fuktcard:
+          - height: 100%
+          - width: 100%
+          - display: flex
+          - align-items: center
+          - justify-content: center
+        btn1:
+          - height: 100%
+          - display: flex
+          - align-items: center
+          - justify-content: center
+        btn2:
+          - height: 100%
+          - display: flex
+          - align-items: center
+          - justify-content: center
+      grid:
+        - grid-template-areas: >-
+            "n n btn1" "tempcard fuktcard btn1" "tempcard fuktcard btn2" "i
+            other btn2"
+        - grid-template-columns: 1fr 1fr 0.8fr
+        - grid-template-rows: 1fr 0.5fr 0.5fr 1fr
+      name:
+        - font-family: Roboto, sans-serif
+        - letter-spacing: .1rem
+        - justify-self: stretch
+        - align-self: start
+        - font-size: 20px
+        - font-weight: 800
+        - padding-bottom: 1em
+        - color: rgba(236, 236, 236,0.8)
+        - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
+      state:
+        - display: none
+      img_cell:
+        - justify-content: start
+        - position: absolute
+        - width: 100px;
+        - height: 100px;
+        - left: 0
+        - bottom: 0
+        - margin: 0 0 -30px -30px
+        - background: |
+            [[[            
+              return `radial-gradient(at bottom left, ${variables.roomcolor}, transparent 100%)`;
+            ]]]
+        - border-radius: 500px
+      icon:
+        - width: 40px
+        - color: |
+            [[[
+              if (variables.motion_entity && states[variables.motion_entity]?.state == 'on') {                
+                return "rgba(255,255,255,0.9)";                                    
+              }
+              return "rgba(10,10,10,0.6)";
+            ]]]
+        - opacity: '0.6'
+      card:
+        - box-shadow: |
+            [[[
+              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
+              let output = "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.38);"              
+              if (!variables.temperature_entity) { return output; }
+               let tVal = states[variables.temperature_entity]?.state;                                
+              let tValScaled = convertRange(tVal,[15,30],[120,0]);
+              output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
+              return output;  
+            ]]]
+        - padding: 15px 15px 15px 15px
+        - border-radius: 20px
+        - border-width: 0px
+        - margin-bottom: 0px
+        - min-height: 100px
+        - border-color: |
+            [[[
+              if (variables.roomcolor) {
+                  let output = `${variables.roomcolor}`;
+                  return output;
+                }                
+              return gray;
+            ]]]
+        - background: |
+            [[[
+              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
+              
+              let tempEntity = states[variables.temperature_entity];                                          
+              let tVal = tempEntity.state;                                
+              
+              let humidEntity = states[variables.humidity_entity];              
+              let hVal = humidEntity.state;                                                    
+              let tValScaled = convertRange(tVal,[15,30],[100,0]);
+              let tempHsla = `hsla(${tValScaled},50%,50%,1)`;                                      
+              let hValScaled = convertRange(hVal,[50,100],[130,235])              
+              let fuktHsla = `hsla(${hValScaled},10%,50%,1)`;
+
+              let roomHsla = tempHsla;
+              if (variables.roomcolor) {
+                roomHsla = variables.roomcolor;
+              }
+                
+              let output3 = `
+              radial-gradient(at bottom left, ${roomHsla}, transparent 100%),
+              radial-gradient(at top right, ${tempHsla} 0%, transparent 100%),
+              radial-gradient(at bottom right, transparent 0%, ${fuktHsla} 50%, transparent 100%)
+              `;
+              
+              return output3;
+            ]]]
+  roomcard_nocontrols:
+    template: roomcard2
+    custom_fields:
+      tempcard:
+        card:
+          type: custom:button-card
+          template: roomcard_tinystate
+          variables:
+            compact_mode: true
+          entity: |
+            [[[
+              return variables.temperature_entity;  
+            ]]]
+      fuktcard:
+        card:
+          type: custom:button-card
+          template: roomcard_tinystate
+          variables:
+            compact_mode: true
+          entity: |
+            [[[
+              return variables.humidity_entity;  
+            ]]]
+    styles:
+      custom_fields: null
+      grid:
+        - grid-template-areas: '"n n n" "i tempcard fuktcard"'
+        - grid-template-columns: 0.5fr 1fr 1fr
+        - grid-template-rows: 1fr 1fr
+      card:
+        - min-height: 10px
+      name:
+        - font-size: 15px
+        - font-weight: 800
+        - padding-bottom: 0.5em
+decluttering_templates:
+  spisestue-media:
+    card:
+      type: vertical-stack
+      cards:
+        - type: media-control
+          entity: media_player.spisestue_nest_hub
+  spisestue-lys:
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:mushroom-light-card
+          entity: light.spisestue_lampe_light
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: false
+          name: Lampe
+          icon: mdi:lamp
+        - type: custom:mushroom-light-card
+          entity: light.spisestue_sterjnelys
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: true
+          name: Sterjnelys
+          icon: mdi:star-circle
+  stue-media:
+    card:
+      type: vertical-stack
+      cards:
+        - type: media-control
+          entity: media_player.living_room_tv_2
+        - type: media-control
+          entity: media_player.piano_nest_hub
+  stue-lys:
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:mushroom-light-card
+          entity: light.stue_stikkontakt
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: false
+          name: Stue Lampe
+          icon: mdi:lamp
+        - type: custom:mushroom-light-card
+          entity: light.juletree_lys_switch
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: false
+          icon: mdi:bookshelf
+        - type: custom:mushroom-light-card
+          entity: light.lekelys_light
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: false
+          icon: mdi:bookshelf
+  al-media:
+    card:
+      type: custom:mini-media-player
+      entity: media_player.beberom_hoyttaler
+      artwork: cover-fit
+      group: false
+      source: full
+      sound_mode: full
+  al-kamera:
+    card:
+      type: custom:webrtc-camera
+      url: rtsp://homeass:homeass@192.168.1.165:554/stream1
+      ui: false
+      muted: false
+      digital_ptz:
+        mouse_drag_pan: true
+        mouse_wheel_zoom: true
+        mouse_double_click_zoom: true
+        touch_drag_pan: true
+        touch_pinch_zoom: true
+        touch_tap_drag_zoom: true
+        persist: true
+  soverom-lys:
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:mushroom-light-card
+          entity: light.senglys
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: false
+        - type: grid
+          columns: 2
+          square: false
+          cards:
+            - type: custom:mushroom-light-card
+              name: Venstre
+              entity: light.soveromlys_venstre
+              show_brightness_control: true
+              layout: horizontal
+              show_color_control: false
+            - type: custom:mushroom-light-card
+              entity: light.soveromlys_hoyre
+              name: Høyre
+              show_brightness_control: true
+              layout: horizontal
+              show_color_control: false
+        - type: custom:mushroom-light-card
+          entity: light.soverom_speil_2_light
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: false
+          name: Speil
+        - type: custom:mushroom-light-card
+          entity: light.soverom_lys_tak_1_light
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: false
+          name: Tak
+  soverom-media:
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:mini-media-player
+          entity: media_player.soverom_hoyttaler
+          artwork: cover-fit
+          group: false
+        - type: custom:mini-media-player
+          entity: media_player.soverom_hoyttaler
+          artwork: cover-fit
+          group: false
+          shortcuts:
+            columns: 4
+            buttons:
+              - type: script
+                id: script.playnrkp1kjoekken
+                name: P1
+              - type: script
+                id: script.playnrkp1pluskjoekken
+                name: P1+
+              - type: script
+                id: script.playnrkklassiskkjoekken
+                name: Klassisk
+              - type: script
+                id: script.playradio4
+                name: BBC R4
+  kontor-enheter:
+    card:
+      type: vertical-stack
+      cards:
+        - type: conditional
+          conditions:
+            - condition: user
+              users:
+                - 03908e65b4514ba48ac9f9946bb5ca8d
+          card:
+            type: entities
+            entities:
+              - entity: switch.spisestue_skjoteledning_b
+              - entity: switch.spisestue_skjoteledning_c
+              - entity: switch.kontor_sentral_skjerm
+        - show_name: true
+          show_icon: true
+          type: button
+          tap_action:
+            action: navigate
+            navigation_path: /config/zha/add
+          entity: update.zha_network_card_update
+          icon: mdi:zigbee
+        - type: entities
+          entities:
+            - sensor.grace_gputemperature
+            - sensor.grace_storage_d
+            - sensor.grace_storage_c
+  kontor-lys:
+    card:
+      type: vertical-stack
+      cards:
+        - type: grid
+          columns: 2
+          square: false
+          cards:
+            - type: custom:mushroom-light-card
+              entity: light.zone_light_1
+              show_brightness_control: true
+              layout: horizontal
+              show_color_control: false
+              name: Light 1
+            - type: custom:mushroom-light-card
+              entity: light.zone_light_2
+              show_brightness_control: true
+              layout: horizontal
+              show_color_control: false
+              name: Light 2
+        - type: grid
+          columns: 2
+          square: false
+          cards:
+            - type: custom:mushroom-light-card
+              entity: light.kontorlys_venstre
+              show_brightness_control: true
+              layout: horizontal
+              show_color_control: false
+              name: Venstre
+            - type: custom:mushroom-light-card
+              entity: light.kontorlys_hoyre
+              show_brightness_control: true
+              layout: horizontal
+              show_color_control: false
+              name: Høyre
+        - type: custom:mushroom-light-card
+          entity: light.kontor_magic
+          show_brightness_control: true
+          layout: horizontal
+          show_color_control: false
+        - type: entities
+          entities:
+            - input_select.kontor_mode
+  kjokken-media:
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:mini-media-player
+          entity: media_player.kjokken_hoyttaler
+          artwork: cover-fit
+          group: false
+          shortcuts:
+            columns: 4
+            buttons:
+              - type: script
+                id: script.playnrkp1kjoekken
+                name: P1
+              - type: script
+                id: script.playnrkp1pluskjoekken
+                name: P1+
+              - type: script
+                id: script.playnrkklassiskkjoekken
+                name: Klassisk
+              - type: script
+                id: script.playradio4
+                name: BBC R4
+  kjokken-enheter:
+    default:
+      - icon: fire
+    card:
+      type: vertical-stack
+      cards:
+        - type: history-graph
+          entities:
+            - entity: sensor.kjoleskap_temperatur
+        - type: grid
+          columns: 1
+          square: false
+          cards:
+            - type: entities
+              entities:
+                - entity: sensor.sm_n960f_battery_level
+                - entity: switch.juletree_switch
+                - entity: sensor.kjoleskap_temperatur
+views:
+  - path: roomcardnew
+    cards:
+      - type: grid
+        square: false
+        columns: 2
+        cards:
+          - type: custom:button-card
+            template: roomcard2
+            variables:
+              temperature_entity: sensor.zone_temperatur
+              humidity_entity: sensor.zone_fuktighet
+              motion_entity: binary_sensor.kontor_bevegelsessensor_occupancy
+              name: Kontor
+              roomcolor: hsla(17, 50%, 50%, 1)
+              btn1_hash: '#kontor-lys'
+              btn1_icon: mdi:lamp
+              btn1_onoff: light.kontor_magic
+              btn2_hash: '#kontor-enheter'
+              btn2_icon: mdi:devices
+              btn2_onoff: switch.spisestue_skjoteledning_b
+              room_hash: '#kontor-room'
+            name: Kontor
+            icon: mdi:chair-rolling
+          - type: custom:button-card
+            template: roomcard2
+            variables:
+              temperature_entity: sensor.kjoekken_temperatur
+              humidity_entity: sensor.kjoekken_fuktighet
+              motion_entity: binary_sensor.kjoekken_bevegelsessensor_occupancy
+              name: Kjøkken
+              roomcolor: hsla(138, 10%, 50%, 1)
+              btn1_hash: '#kjokken-media'
+              btn1_icon: mdi:speaker
+              btn1_onoff: media_player.kjokken_hoyttaler
+              btn2_hash: '#kjokken-enheter'
+              btn2_icon: mdi:devices
+              room_hash: '#kjokken-room'
+            name: Kjøkken
+            icon: mdi:microwave
+      - square: false
+        type: grid
+        cards:
+          - type: custom:button-card
+            template: roomcard2
+            group_expand: true
+            name: Soverom
+            icon: mdi:bed
+            variables:
+              temperature_entity: sensor.soverom_temperatur
+              humidity_entity: sensor.soverom_fuktighet
+              name: Soverom
+              roomcolor: hsla(238, 50%, 50%, 1)
+              btn1_hash: '#soverom-lys'
+              btn1_icon: mdi:lamp
+              btn1_onoff: light.soverom_lys
+              btn2_hash: '#soverom-media'
+              btn2_icon: mdi:speaker
+              room_hash: '#soverom-room'
+          - type: custom:button-card
+            template: roomcard2
+            variables:
+              temperature_entity: sensor.kontor_temperatur
+              humidity_entity: sensor.kontor_fuktighet
+              roomcolor: hsla(299, 50%, 50%, 1)
+              btn1_hash: '#al-kamera'
+              btn1_icon: mdi:video
+              btn2_hash: '#al-media'
+              btn2_icon: mdi:speaker
+              room_hash: '#al-room'
+            name: Anna-Lisbeth
+            icon: mdi:elephant
+            entity: sensor.kontor_temperatur
+            styles:
+              name:
+                - font-size: 0.9em
+        columns: 2
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: custom:button-card
+            template: aqicard
+      - square: false
+        type: grid
+        cards:
+          - type: custom:button-card
+            template: roomcard2
+            variables:
+              temperature_entity: sensor.awair_lr_temp
+              humidity_entity: sensor.awair_lr_humid
+              name: Stue
+              roomcolor: hsla(104, 100%, 27%, 1)
+              room_hash: '#stue-room'
+              btn1_hash: '#stue-lys'
+              btn1_icon: mdi:lamp
+              btn1_onoff: light.stue_lys
+              btn2_hash: '#stue-media'
+              btn2_icon: mdi:speaker
+            name: Stue
+            icon: mdi:sofa
+          - type: custom:button-card
+            template: roomcard2
+            variables:
+              temperature_entity: sensor.gjallarhorn_temperature
+              humidity_entity: sensor.gjallarhorn_humidity
+              motion_entity: binary_sensor.spisestue_any
+              roomcolor: hsla(163, 100%, 27%, 1)
+              room_hash: '#spisestue-room'
+              btn1_hash: '#spisestue-lys'
+              btn1_icon: mdi:lamp
+              btn1_onoff: light.spisestue_lys
+              btn2_hash: '#spisestue-media'
+              btn2_icon: mdi:speaker
+            name: Spisestue
+            icon: mdi:star
+            tap_action:
+              action: navigate
+              navigation_path: '#spisestue-room'
+            show_state: true
+            styles:
+              name:
+                - font-size: 1.0em
+        columns: 2
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#kjokken-room'
+            name: Kjøkken
+            icon: mdi:table-chair
+            button_type: state
+            show_state: true
+            show_last_changed: false
+            show_attribute: false
+            card_layout: large
+            entity: sensor.kjoekken_temperatur
+          - type: custom:decluttering-card
+            template: kjokken-media
+          - type: custom:decluttering-card
+            template: kjokken-enheter
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#kjokken-media'
+            name: Kjokken Media
+            icon: mdi:speaker
+            button_type: state
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+            entity: media_player.kjokken_hoyttaler
+          - type: custom:decluttering-card
+            template: kjokken-media
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#kjokken-enheter'
+            name: Kjøkken Enheter
+            icon: mdi:table-chair
+            button_type: state
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: kjokken-enheter
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#kontor-lys'
+            name: Kontor
+            icon: mdi:chair-rolling
+            entity: light.kontor_magic
+            button_type: slider
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: kontor-lys
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#kontor-enheter'
+            name: Kontor Enheter
+            icon: mdi:chair-rolling
+            button_type: state
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: kontor-enheter
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#kontor-room'
+            name: Kontor
+            icon: mdi:chair-rolling
+            button_type: state
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: kontor-lys
+          - type: custom:decluttering-card
+            template: kontor-enheter
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#soverom-media'
+            name: Soverom Media
+            icon: mdi:speaker
+            button_type: state
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: soverom-media
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#soverom-lys'
+            name: Soverom Lys
+            icon: mdi:bed
+            entity: light.soverom_lys
+            button_type: slider
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: soverom-lys
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#soverom-room'
+            name: Soverom
+            icon: mdi:bed
+            entity: light.soverom_lys
+            button_type: slider
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: soverom-media
+          - type: custom:decluttering-card
+            template: soverom-lys
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#al-kamera'
+            name: AL Kamera
+            icon: mdi:chair-rolling
+            button_type: state
+            show_state: false
+            show_header: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: al-kamera
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#al-media'
+            name: AL Media
+            icon: mdi:speaker
+            button_type: state
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+            entity: media_player.beberom_hoyttaler
+          - type: custom:decluttering-card
+            template: al-media
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#al-room'
+            name: Anna-Lisbeth
+            icon: mdi:elephant
+            button_type: name
+            show_state: false
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: vertical-stack
+            cards:
+              - type: custom:decluttering-card
+                template: al-media
+              - type: custom:decluttering-card
+                template: al-kamera
+              - type: grid
+                square: false
+                columns: 2
+                cards:
+                  - type: tile
+                    entity: counter.al_ibuprofen
+                    tap_action:
+                      action: more-info
+                    icon: mdi:medication
+                    vertical: false
+                    hide_state: false
+                    state_content:
+                      - last-changed
+                      - state
+                      - last-updated
+                  - type: tile
+                    entity: counter.al_paracetamol
+                    tap_action:
+                      action: more-info
+                    icon: mdi:medication
+                    vertical: false
+                    hide_state: false
+                    state_content:
+                      - last-changed
+                      - state
+                      - last-updated
+              - square: false
+                type: grid
+                cards:
+                  - type: custom:mushroom-light-card
+                    entity: light.beberom_lys_light
+                    name: Seng
+                    show_color_temp_control: false
+                    use_light_color: true
+                    show_brightness_control: true
+                    layout: horizontal
+                  - type: custom:mushroom-light-card
+                    entity: light.brodboks_stikkontakt_switch
+                    name: Lese lys
+                columns: 2
+              - type: custom:comfortable-environment-card
+                room_name: Anna-Lisbeth
+                temperature_sensor: sensor.kontor_temperatur
+                humidity_sensor: sensor.kontor_fuktighet
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#stue-media'
+            name: Stue Media
+            icon: mdi:sofa
+            entity: media_player.living_room_tv_2
+            button_type: name
+            show_state: true
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: stue-media
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#stue-lys'
+            name: Stue Lys
+            icon: mdi:sofa
+            entity: light.stue_lys
+            button_type: name
+            show_state: true
+            show_last_changed: true
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: stue-lys
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#stue-room'
+            name: Stue
+            icon: mdi:sofa
+            entity: sensor.awair_lr_temp
+            button_type: state
+            show_state: true
+            show_last_changed: false
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: stue-lys
+          - type: custom:decluttering-card
+            template: stue-media
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: sensor.awair_lr_score
+                icon_color: primary
+              - type: entity
+                entity: sensor.awair_lr_pm25
+                icon: mdi:molecule
+                icon_color: red
+              - type: entity
+                entity: sensor.awair_lr_voc
+                icon: mdi:air-filter
+                icon_color: teal
+              - type: entity
+                entity: sensor.awair_lr_co2
+                icon: mdi:molecule-co2
+                icon_color: amber
+            alignment: justify
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#spisestue-lys'
+            name: Spisestue
+            icon: mdi:desk
+            button_type: state
+            show_state: true
+            show_last_changed: false
+            show_attribute: false
+            card_layout: large
+          - type: custom:decluttering-card
+            template: spisestue-lys
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#spisestue-media'
+            name: Spisestue
+            icon: mdi:desk
+            card_layout: large
+          - type: custom:decluttering-card
+            template: spisestue-media
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#spisestue-room'
+            name: Spisestue
+            icon: mdi:desk
+            card_layout: large
+          - type: custom:decluttering-card
+            template: spisestue-lys
+          - type: custom:decluttering-card
+            template: spisestue-media
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#garasje-room'
+            name: Garasje
+            icon: mdi:weight-lifter
+            card_layout: large
+          - type: custom:webrtc-camera
+            url: rtsp://homeass:homeass@192.168.1.46:554/stream2
+            ui: false
+            muted: false
+            digital_ptz:
+              mouse_drag_pan: true
+              mouse_wheel_zoom: true
+              mouse_double_click_zoom: true
+              touch_drag_pan: true
+              touch_pinch_zoom: true
+              touch_tap_drag_zoom: true
+              persist: true
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#verksted-room'
+            name: Verksted
+            icon: mdi:hand-saw
+            card_layout: large
+          - type: custom:webrtc-camera
+            url: rtsp://homeass:homeass@192.168.1.47:554/stream1
+            ui: false
+            muted: false
+            digital_ptz:
+              mouse_drag_pan: true
+              mouse_wheel_zoom: true
+              mouse_double_click_zoom: true
+              touch_drag_pan: true
+              touch_pinch_zoom: true
+              touch_tap_drag_zoom: true
+              persist: true
+      - square: false
+        columns: 3
+        type: grid
+        cards:
+          - type: custom:button-card
+            template: roomcard_nocontrols
+            variables:
+              temperature_entity: sensor.garasje_temperatur
+              humidity_entity: sensor.garasje_fuktighet
+              name: Garasje
+              roomcolor: hsla(231, 51%, 26%, 1)
+              room_hash: '#garasje-room'
+            name: Garasje
+            icon: mdi:weight-lifter
+          - type: custom:button-card
+            template: roomcard_nocontrols
+            variables:
+              temperature_entity: sensor.verksted_temperatur
+              humidity_entity: sensor.verksted_fuktighet
+              motion_entity: binary_sensor.dorsensor_status
+              roomcolor: hsla(100, 51%, 26%, 1)
+              room_hash: '#verksted-room'
+            name: Verksted
+            icon: mdi:hand-saw
+          - type: custom:button-card
+            template: roomcard_nocontrols
+            variables:
+              temperature_entity: sensor.baderom_temperatur
+              humidity_entity: sensor.baderom_fuktighet
+              roomcolor: hsla(189, 66%, 52%, 1)
+            name: Baderom
+            icon: mdi:shower-head
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: custom:button-card
+            template: solarcard
