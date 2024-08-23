@@ -1,4 +1,87 @@
 button_card_templates:
+  mediacard:
+    variables:
+      entity_id: 'media_player.soverom_hoyttaler'
+    styles:
+      grid:
+        - grid-template-areas: '"i n n" "player player player"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr    
+  
+    custom_fields:
+      player:
+        card:
+            type: custom:mini-media-player            
+            entity: | 
+              [[[
+                return variables.entity_id;
+              ]]]
+            artwork: cover-fit
+            group: false
+            shortcuts:
+              columns: 4
+              buttons:              
+                - type: script
+                  id: script.mass_media_play
+                  data:
+                    media_player_entity_id: |
+                      [[[ return variables.entity_id; ]]]                      
+                    media_id: NRK P1
+                  name: P1
+                - type: script
+                  id: script.mass_media_play
+                  data:
+                    media_player_entity_id: |
+                      [[[ return variables.entity_id; ]]]                      
+                    media_id: NRK P1+
+                  name: P1+
+                - type: script
+                  id: script.mass_media_play
+                  data:
+                    media_player_entity_id: |
+                      [[[ return variables.entity_id; ]]]                      
+                    media_id: NRK Klassisk
+                  name: Klassisk
+                - type: script
+                  id: script.mass_media_play
+                  data:
+                    media_player_entity_id: |
+                      [[[ return variables.entity_id; ]]]                      
+                    media_id: BBC Radio 4
+                  name: Radio 4
+                  
+
+  barscard:
+    variables:
+      min: 0
+      max: 100
+      startcolour: blue
+      endcolour: rgba(20,20,20,0.3)
+    styles:
+      state:
+        - text-align: left
+        - width: 100%
+        - font-size: 11px
+        - font-weight: bold
+      name:
+        - text-align: left
+        - font-size: 11px
+        - width: 100%
+      card:
+        - height: 100%;
+        - background: |
+            [[[
+              console.log(entity.state);
+              var perc = parseInt((entity.state / variables.max) * 100);
+              if (isNaN(perc)) { perc = 0; }
+              var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour} ${perc}%, ${variables.endcolour} 100%)`;
+              console.log(grad);
+              return grad;
+            ]]]
+      grid:
+        - grid-template-areas: '"i n n" "i s s"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
   inlinecard:
     styles:
       state:
@@ -28,7 +111,7 @@ button_card_templates:
         - grid-template-areas: '"solar battery consumption"'
         - grid-template-columns: 1fr 1fr 1fr
         - grid-template-rows: 1fr
-        - gap: 2px 0px
+        - gap: 2px 2px
       solar:
         - grid-area: 1 / 2 / 2 / 3
       battery:
@@ -39,18 +122,23 @@ button_card_templates:
       solar:
         card:
           type: custom:button-card
-          template: inlinecard
+          template: barscard
           show_state: true
           icon: mdi:sun-wireless
           name: Solar
           entity: sensor.lux_solar_output_live
+          variables:
+            max: 5000
+            startcolour: rgba(156,174,0,0.7)
       battery:
         card:
           type: custom:button-card
-          template: inlinecard
+          template: barscard
           show_state: true
           name: Battery
           entity: sensor.lux_battery
+          variables:
+            startcolour: rgba(0,104,0,0.7)
       consumption:
         card:
           type: custom:button-card
@@ -368,8 +456,7 @@ button_card_templates:
             ]]]
         - padding: 15px 15px 15px 15px
         - border-radius: 20px
-        - border-width: 0px
-        - margin-bottom: 0px
+        - border-width: 0px        
         - min-height: 100px
         - border-color: |
             [[[
@@ -437,6 +524,7 @@ button_card_templates:
         - grid-template-rows: 1fr 1fr
       card:
         - min-height: 10px
+        
       name:
         - font-size: 15px
         - font-weight: 800
@@ -446,8 +534,10 @@ decluttering_templates:
     card:
       type: vertical-stack
       cards:
-        - type: media-control
-          entity: media_player.spisestue_nest_hub
+        - type: custom:button-card
+          template: mediacard
+          variables:          
+            entity_id: media_player.spisestue_nest_hub
   spisestue-lys:
     card:
       type: vertical-stack
@@ -472,8 +562,10 @@ decluttering_templates:
       cards:
         - type: media-control
           entity: media_player.living_room_tv_2
-        - type: media-control
-          entity: media_player.piano_nest_hub
+        - type: custom:button-card
+          template: mediacard
+          variables:          
+            entity_id: media_player.piano_nest_hub
   stue-lys:
     card:
       type: vertical-stack
@@ -499,12 +591,11 @@ decluttering_templates:
           icon: mdi:bookshelf
   al-media:
     card:
-      type: custom:mini-media-player
-      entity: media_player.beberom_hoyttaler
-      artwork: cover-fit
-      group: false
-      source: full
-      sound_mode: full
+      type: custom:button-card
+      template: mediacard
+      variables:          
+        entity_id: media_player.beberom_hoyttaler
+            
   al-kamera:
     card:
       type: custom:webrtc-camera
@@ -560,29 +651,12 @@ decluttering_templates:
     card:
       type: vertical-stack
       cards:
-        - type: custom:mini-media-player
-          entity: media_player.soverom_hoyttaler
-          artwork: cover-fit
-          group: false
-        - type: custom:mini-media-player
-          entity: media_player.soverom_hoyttaler
-          artwork: cover-fit
-          group: false
-          shortcuts:
-            columns: 4
-            buttons:
-              - type: script
-                id: script.playnrkp1kjoekken
-                name: P1
-              - type: script
-                id: script.playnrkp1pluskjoekken
-                name: P1+
-              - type: script
-                id: script.playnrkklassiskkjoekken
-                name: Klassisk
-              - type: script
-                id: script.playradio4
-                name: BBC R4
+        - type: custom:button-card
+          template: mediacard
+          variables:          
+            entity_id: media_player.soverom_hoyttaler_2
+        
+
   kontor-enheter:
     card:
       type: vertical-stack
@@ -698,6 +772,10 @@ decluttering_templates:
                 - entity: sensor.kjoleskap_temperatur
 views:
   - path: roomcardnew
+    background: >-
+      linear-gradient(35deg, rgba(39,114,163,0.9710084717480743) 0%,
+      rgba(4,0,61,0.8533613274411327) 47%, rgba(93,47,144,1) 58%,
+      rgba(14,1,122,0.928991579541973) 100%)  
     cards:
       - type: grid
         square: false
