@@ -348,27 +348,13 @@ button_card_templates:
               [[[ return variables.btn2_hash; ]]]
             icon: |
               [[[ return variables.btn2_icon; ]]]                              
-      tempcard:
-        card:
-          type: custom:button-card
-          template: roomcard_tinystate
-          icon: mdi:thermometer
-          entity: |
-            [[[
-              return variables.temperature_entity;  
-            ]]]
-      fuktcard:
-        card:
-          type: custom:button-card
-          template: roomcard_tinystate
-          icon: mdi:water
-          entity: |
-            [[[
-              return variables.humidity_entity;  
-            ]]]
+
       tfukt: >
           [[[
-            return `<span>yep</span>`
+            return `
+            <span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${states[variables.temperature_entity].state}</span>
+            <br/>
+            <span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${states[variables.humidity_entity].state}</span>`
   
           ]]]
     variables:
@@ -388,6 +374,39 @@ button_card_templates:
         other:
           - padding: 20px
           - border: 0 !important
+        tfukt: 
+        - font-size: 0.8em
+        - padding: 1em
+        - height: 100%
+        - width: 100%
+        - text-align: center
+        - background: |
+            [[[
+              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
+              
+              let tempEntity = states[variables.temperature_entity];                                          
+              let tVal = tempEntity.state;                                
+              
+              let humidEntity = states[variables.humidity_entity];              
+              let hVal = humidEntity.state;                                                    
+              let tValScaled = convertRange(tVal,[15,30],[100,0]);
+              let tempHsla = `hsla(${tValScaled},50%,50%,0.9)`;                                      
+              let hValScaled = convertRange(hVal,[50,100],[130,235])              
+              let fuktHsla = `hsla(${hValScaled},10%,50%,0.9)`;
+
+              let roomHsla = tempHsla;
+              if (variables.roomcolor) {
+                roomHsla = variables.roomcolor;
+              }
+              
+              let output3 = `                      
+              radial-gradient(to left, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%),
+              radial-gradient(to right, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%)              
+              `;
+              console.log(output3);
+              
+              return output3;
+            ]]]
         tempcard:
           - height: 100%
           - width: 100%
@@ -467,7 +486,7 @@ button_card_templates:
         - min-height: 100px
         - background: |
             [[[
-              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
+              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
               
               let tempEntity = states[variables.temperature_entity];                                          
               let tVal = tempEntity.state;                                
@@ -483,61 +502,22 @@ button_card_templates:
               if (variables.roomcolor) {
                 roomHsla = variables.roomcolor;
               }
-
               
-              let output3 = `
-              
-              
-              
-              
-              
-              
-              radial-gradient(at top left, ${roomHsla} 0%, transparent 40%),
-              radial-gradient(at top right, ${roomHsla} 0%, transparent 40%),
-              linear-gradient(to top,    ${tempHsla} 15%, ${fuktHsla} 20%, ${roomHsla}, transparent 50%),
-              linear-gradient(to bottom, ${tempHsla} 15%, ${fuktHsla} 20%, ${roomHsla}, transparent 50%),
-              linear-gradient(to left,   ${tempHsla} 15%, ${fuktHsla} 20%, ${roomHsla}, transparent 50%),
-              linear-gradient(to right,  ${tempHsla} 15%, ${fuktHsla} 20%, ${roomHsla}, transparent 50%),
-              
-              
-              
-              radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%)             
-              
-              
-              
-              
+              let output3 = `                      
+              radial-gradient(at top left, ${roomHsla} 0%, transparent 50%),
+              radial-gradient(at top right, ${roomHsla} 0%, transparent 50%),
+              radial-gradient(at bottom right, ${roomHsla} 0%, transparent 50%),                                                    
+              radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%)                           
               `;
               console.log(output3);
               return output3;
             ]]]
   roomcard_nocontrols:
-    template: roomcard2
-    custom_fields:
-      tempcard:
-        card:
-          type: custom:button-card
-          template: roomcard_tinystate
-          variables:
-            compact_mode: true
-          entity: |
-            [[[
-              return variables.temperature_entity;  
-            ]]]
-      fuktcard:
-        card:
-          type: custom:button-card
-          template: roomcard_tinystate
-          variables:
-            compact_mode: true
-          entity: |
-            [[[
-              return variables.humidity_entity;  
-            ]]]
-    styles:
-      custom_fields: null
+    template: roomcard2  
+    styles:      
       grid:
-        - grid-template-areas: '"n n n" "i tempcard fuktcard"'
-        - grid-template-columns: 0.5fr 1fr 1fr
+        - grid-template-areas: '"n n n" "i tfukt tfukt"'
+        - grid-template-columns: 1fr 0.5fr 1fr
         - grid-template-rows: 1fr 1fr
       card:
         - min-height: 10px
