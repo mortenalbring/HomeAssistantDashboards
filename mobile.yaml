@@ -1,56 +1,53 @@
 button_card_templates:
   mediacard:
     variables:
-      entity_id: 'media_player.soverom_hoyttaler'
+      entity_id: media_player.soverom_hoyttaler
     styles:
       grid:
         - grid-template-areas: '"i n n" "player player player"'
         - grid-template-columns: 1fr 1fr 1fr
-        - grid-template-rows: 1fr    
-  
+        - grid-template-rows: 1fr
     custom_fields:
       player:
         card:
-            type: custom:mini-media-player            
-            entity: | 
-              [[[
-                return variables.entity_id;
-              ]]]
-            artwork: cover-fit
-            group: false
-            shortcuts:
-              columns: 4
-              buttons:              
-                - type: script
-                  id: script.mass_media_play
-                  data:
-                    media_player_entity_id: |
-                      [[[ return variables.entity_id; ]]]                      
-                    media_id: NRK P1
-                  name: P1
-                - type: script
-                  id: script.mass_media_play
-                  data:
-                    media_player_entity_id: |
-                      [[[ return variables.entity_id; ]]]                      
-                    media_id: NRK P1+
-                  name: P1+
-                - type: script
-                  id: script.mass_media_play
-                  data:
-                    media_player_entity_id: |
-                      [[[ return variables.entity_id; ]]]                      
-                    media_id: NRK Klassisk
-                  name: Klassisk
-                - type: script
-                  id: script.mass_media_play
-                  data:
-                    media_player_entity_id: |
-                      [[[ return variables.entity_id; ]]]                      
-                    media_id: BBC Radio 4
-                  name: Radio 4
-                  
-
+          type: custom:mini-media-player
+          entity: |
+            [[[
+              return variables.entity_id;
+            ]]]
+          artwork: cover-fit
+          group: false
+          shortcuts:
+            columns: 4
+            buttons:
+              - type: script
+                id: script.mass_media_play
+                data:
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
+                  media_id: NRK P1
+                name: P1
+              - type: script
+                id: script.mass_media_play
+                data:
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
+                  media_id: NRK P1+
+                name: P1+
+              - type: script
+                id: script.mass_media_play
+                data:
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
+                  media_id: NRK Klassisk
+                name: Klassisk
+              - type: script
+                id: script.mass_media_play
+                data:
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
+                  media_id: BBC Radio 4
+                name: Radio 4
   barscard:
     variables:
       min: 0
@@ -69,13 +66,14 @@ button_card_templates:
         - width: 100%
       card:
         - height: 100%;
+        - border: 1px solid;
+        - border-color: |
+            [[[ return variables.startcolour; ]]]
         - background: |
-            [[[
-              console.log(entity.state);
+            [[[              
               var perc = parseInt((entity.state / variables.max) * 100);
               if (isNaN(perc)) { perc = 0; }
-              var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour} ${perc}%, ${variables.endcolour} 100%)`;
-              console.log(grad);
+              var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour} ${perc}%, ${variables.endcolour} 100%)`;              
               return grad;
             ]]]
       grid:
@@ -142,10 +140,13 @@ button_card_templates:
       consumption:
         card:
           type: custom:button-card
-          template: inlinecard
+          template: barscard
           show_state: true
-          name: Consumption
+          name: Usage
           entity: sensor.lux_home_consumption_live
+          variables:
+            max: 2000
+            startcolour: rgba(150,100,0,0.7)
   aqicard:
     show_state: true
     styles:
@@ -157,7 +158,7 @@ button_card_templates:
         - grid-template-areas: '"score c02 tvoc pm25"'
         - grid-template-columns: 1fr 1fr 1fr 1fr
         - grid-template-rows: 1fr
-        - gap: 2px 0px
+        - gap: 2px 2px
       solar:
         - grid-area: 1 / 2 / 2 / 3
       battery:
@@ -168,11 +169,13 @@ button_card_templates:
       score:
         card:
           type: custom:button-card
-          template: inlinecard
+          template: barscard
           show_state: true
           icon: mdi:percent
           name: Air
           entity: sensor.awair_lr_score
+          variables:
+            startcolour: rgba(73, 185, 230,0.5)
       c02:
         card:
           type: custom:button-card
@@ -259,9 +262,9 @@ button_card_templates:
             function convertRange(value,r1,r2) { return
             (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];} 
 
-            let hState = entity.state;                                 let min =
-            50; let max = 100;             if (entity.attributes?.device_class
-            == 'humidity') {
+            let hState = entity.state;                                 
+            let min = 50; let max = 100;             
+            if (entity.attributes?.device_class == 'humidity') {
               min = 50;
               max = 100;
             } if (entity.attributes?.device_class == 'temperature') {
@@ -363,6 +366,11 @@ button_card_templates:
             [[[
               return variables.humidity_entity;  
             ]]]
+      tfukt: >
+          [[[
+            return `<span>yep</span>`
+  
+          ]]]
     variables:
       temperature_entity: null
       humidity_entity: null
@@ -404,8 +412,7 @@ button_card_templates:
           - justify-content: center
       grid:
         - grid-template-areas: >-
-            "n n btn1" "tempcard fuktcard btn1" "tempcard fuktcard btn2" "i
-            other btn2"
+            "n n btn1" "tfukt tfukt btn1" "tfukt tfukt btn2" "i other btn2"
         - grid-template-columns: 1fr 1fr 0.8fr
         - grid-template-rows: 1fr 0.5fr 0.5fr 1fr
       name:
@@ -430,7 +437,7 @@ button_card_templates:
         - margin: 0 0 -30px -30px
         - background: |
             [[[            
-              return `radial-gradient(at bottom left, ${variables.roomcolor}, transparent 100%)`;
+              return `radial-gradient(at bottom left, ${variables.roomcolor} 70%, transparent 100%)`;
             ]]]
         - border-radius: 500px
       icon:
@@ -438,9 +445,9 @@ button_card_templates:
         - color: |
             [[[
               if (variables.motion_entity && states[variables.motion_entity]?.state == 'on') {                
-                return "rgba(255,255,255,0.9)";                                    
+                return "rgba(255,149,1,0.9)";                                    
               }
-              return "rgba(10,10,10,0.6)";
+              return "rgba(255,255,255,0.9)";
             ]]]
         - opacity: '0.6'
       card:
@@ -456,16 +463,8 @@ button_card_templates:
             ]]]
         - padding: 15px 15px 15px 15px
         - border-radius: 20px
-        - border-width: 0px        
+        - border-width: 0px
         - min-height: 100px
-        - border-color: |
-            [[[
-              if (variables.roomcolor) {
-                  let output = `${variables.roomcolor}`;
-                  return output;
-                }                
-              return gray;
-            ]]]
         - background: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
@@ -476,21 +475,39 @@ button_card_templates:
               let humidEntity = states[variables.humidity_entity];              
               let hVal = humidEntity.state;                                                    
               let tValScaled = convertRange(tVal,[15,30],[100,0]);
-              let tempHsla = `hsla(${tValScaled},50%,50%,1)`;                                      
+              let tempHsla = `hsla(${tValScaled},50%,50%,0.5)`;                                      
               let hValScaled = convertRange(hVal,[50,100],[130,235])              
-              let fuktHsla = `hsla(${hValScaled},10%,50%,1)`;
+              let fuktHsla = `hsla(${hValScaled},10%,50%,0.5)`;
 
               let roomHsla = tempHsla;
               if (variables.roomcolor) {
                 roomHsla = variables.roomcolor;
               }
-                
-              let output3 = `
-              radial-gradient(at bottom left, ${roomHsla}, transparent 100%),
-              radial-gradient(at top right, ${tempHsla} 0%, transparent 100%),
-              radial-gradient(at bottom right, transparent 0%, ${fuktHsla} 50%, transparent 100%)
-              `;
+
               
+              let output3 = `
+              
+              
+              
+              
+              
+              
+              radial-gradient(at top left, ${roomHsla} 0%, transparent 40%),
+              radial-gradient(at top right, ${roomHsla} 0%, transparent 40%),
+              linear-gradient(to top,    ${tempHsla} 15%, ${fuktHsla} 20%, ${roomHsla}, transparent 50%),
+              linear-gradient(to bottom, ${tempHsla} 15%, ${fuktHsla} 20%, ${roomHsla}, transparent 50%),
+              linear-gradient(to left,   ${tempHsla} 15%, ${fuktHsla} 20%, ${roomHsla}, transparent 50%),
+              linear-gradient(to right,  ${tempHsla} 15%, ${fuktHsla} 20%, ${roomHsla}, transparent 50%),
+              
+              
+              
+              radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%)             
+              
+              
+              
+              
+              `;
+              console.log(output3);
               return output3;
             ]]]
   roomcard_nocontrols:
@@ -524,7 +541,6 @@ button_card_templates:
         - grid-template-rows: 1fr 1fr
       card:
         - min-height: 10px
-        
       name:
         - font-size: 15px
         - font-weight: 800
@@ -536,7 +552,7 @@ decluttering_templates:
       cards:
         - type: custom:button-card
           template: mediacard
-          variables:          
+          variables:
             entity_id: media_player.spisestue_nest_hub
   spisestue-lys:
     card:
@@ -564,7 +580,7 @@ decluttering_templates:
           entity: media_player.living_room_tv_2
         - type: custom:button-card
           template: mediacard
-          variables:          
+          variables:
             entity_id: media_player.piano_nest_hub
   stue-lys:
     card:
@@ -593,9 +609,8 @@ decluttering_templates:
     card:
       type: custom:button-card
       template: mediacard
-      variables:          
+      variables:
         entity_id: media_player.beberom_hoyttaler
-            
   al-kamera:
     card:
       type: custom:webrtc-camera
@@ -653,10 +668,8 @@ decluttering_templates:
       cards:
         - type: custom:button-card
           template: mediacard
-          variables:          
+          variables:
             entity_id: media_player.soverom_hoyttaler_2
-        
-
   kontor-enheter:
     card:
       type: vertical-stack
@@ -788,7 +801,7 @@ views:
               humidity_entity: sensor.zone_fuktighet
               motion_entity: binary_sensor.kontor_bevegelsessensor_occupancy
               name: Kontor
-              roomcolor: hsla(17, 50%, 50%, 1)
+              roomcolor: hsla(17, 50%, 50%, 0.8)
               btn1_hash: '#kontor-lys'
               btn1_icon: mdi:lamp
               btn1_onoff: light.kontor_magic
