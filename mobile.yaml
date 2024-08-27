@@ -197,91 +197,7 @@ button_card_templates:
           show_state: true
           name: PM 2.5
           entity: sensor.awair_lr_pm25
-  roomcard_tinystate:
-    show_state: false
-    show_icon: false
-    show_name: false
-    size: 100%
-    tap_action: none
-    hold_action: none
-    double_tap_action: none
-    variables:
-      compact_mode: false
-    custom_fields:
-      ss: |
-        [[[            
-            let unitOfMeasurement = entity.attributes?.unit_of_measurement;            
-            let output = parseInt(entity.state);
-            let icon = 'mdi:thermometer';            
-            if (entity.attributes?.device_class == 'humidity') {
-               icon = 'mdi:water';              
-            }
-            if (entity.attributes?.device_class == 'temperature') {
-               icon = 'mdi:thermometer';
-            }            
-            let size = '15px';
-            if (variables.compact_mode) {
-              size = '10px';  
-              unitOfMeasurement = '';
-            }
-            
-            let content = `<div><ha-icon icon=${icon} style="width:${size}; height: ${size}; color: white;"></ha-icon><span>${output} ${unitOfMeasurement}</span></div>`
-            return content;                  
-        ]]]      
-    styles:
-      grid:
-        - grid-template-areas: '"ss"'
-        - grid-template-columns: 1fr
-        - grid-template-rows: 1fr
-      custom_fields:
-        ss:
-          - font-size: |
-              [[[
-                if (variables.compact_mode) {
-                  return '10px';
-                }
-                return '12px';                    
-              ]]]
-          - text-align: center;
-          - display: flex
-          - align-items: center
-          - width: 100%;
-          - height: 100%;
-          - margin-top: 1em
-          - margin-bottom: 1em
-          - margin-left: 1em
-          - margin-right: 1em
-      card:
-        - height: 100%;
-        - border: 0
-        - text-align: center
-        - height: 100%
-        - background: >
-            [[[                
-
-            function convertRange(value,r1,r2) { return
-            (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];} 
-
-            let hState = entity.state;                                 
-            let min = 50; let max = 100;             
-            if (entity.attributes?.device_class == 'humidity') {
-              min = 50;
-              max = 100;
-            } if (entity.attributes?.device_class == 'temperature') {
-              min = 15;
-              max = 30;
-            }
-                    
-            let hValPercent =
-            convertRange(hState,[min,max],[0,1]);                                
-
-            let hHsla =
-            `hsla(21,${hValPercent*100}%,39%,${hValPercent})`;                                                       
-
-            let gradient2 = `radial-gradient(ellipse closest-side at center,
-            ${hHsla} 60%,transparent 100%)`;
-
-            return gradient2;   ]]]
+  
   roomcardnav:
     icon: |
       [[[
@@ -317,6 +233,7 @@ button_card_templates:
               else { return 'rgba(20,20,20,0.2)'; }
             ]]]
   roomcard2:
+    group_expand: true
     tap_action:
       action: navigate
       navigation_path: |
@@ -340,6 +257,8 @@ button_card_templates:
       btn2:
         card:
           type: custom:button-card
+          triggers_update: |
+            [[[ return variables.btn2_onoff; ]]]          
           template: roomcardnav
           variables:
             onoff: |
@@ -402,8 +321,7 @@ button_card_templates:
               let output3 = `                      
               radial-gradient(to left, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%),
               radial-gradient(to right, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%)              
-              `;
-              console.log(output3);
+              `;              
               
               return output3;
             ]]]
@@ -419,7 +337,7 @@ button_card_templates:
           - display: flex
           - align-items: center
           - justify-content: center
-        btn1:
+        btn1:          
           - height: 100%
           - display: flex
           - align-items: center
@@ -441,7 +359,8 @@ button_card_templates:
         - align-self: start
         - font-size: 20px
         - font-weight: 800
-        - padding-bottom: 1em
+        - padding-bottom: 0
+        
         - color: rgba(236, 236, 236,0.8)
         - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
       state:
@@ -449,6 +368,7 @@ button_card_templates:
       img_cell:
         - justify-content: start
         - position: absolute
+        
         - width: 100px;
         - height: 100px;
         - left: 0
@@ -509,7 +429,7 @@ button_card_templates:
               radial-gradient(at bottom right, ${roomHsla} 0%, transparent 50%),                                                    
               radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%)                           
               `;
-              console.log(output3);
+              
               return output3;
             ]]]
   roomcard_nocontrols:
