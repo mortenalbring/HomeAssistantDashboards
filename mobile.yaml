@@ -67,13 +67,15 @@ button_card_templates:
       card:
         - height: 100%;
         - border: 1px solid;
+        - background-size: 100% 20px, 100%;
         - border-color: |
             [[[ return variables.startcolour; ]]]
         - background: |
             [[[              
               var perc = parseInt((entity.state / variables.max) * 100);
               if (isNaN(perc)) { perc = 0; }
-              var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour} ${perc}%, ${variables.endcolour} 100%)`;              
+              
+              var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour}, ${variables.startcolour} ${perc}%, ${variables.endcolour}, ${variables.endcolour} 100%)`;              
               return grad;
             ]]]
       grid:
@@ -136,7 +138,7 @@ button_card_templates:
           name: Battery
           entity: sensor.lux_battery
           variables:
-            startcolour: rgba(0,104,0,0.7)
+            startcolour: rgba(0,104,0,1)
       consumption:
         card:
           type: custom:button-card
@@ -179,25 +181,36 @@ button_card_templates:
       c02:
         card:
           type: custom:button-card
-          template: inlinecard
+          template: barscard
           show_state: true
           name: CO2
           entity: sensor.awair_lr_co2
+          variables:
+            min: 400
+            max: 1200
+            startcolour: rgba(252, 186, 3,0.2)
       tvoc:
         card:
           type: custom:button-card
-          template: inlinecard
+          template: barscard
           show_state: true
           name: VOC
           entity: sensor.awair_lr_voc
+          variables:
+            min: 500
+            max: 10000
+            startcolour: rgba(252, 69, 3,0.5)
       pm25:
         card:
           type: custom:button-card
-          template: inlinecard
+          template: barscard
           show_state: true
           name: PM 2.5
           entity: sensor.awair_lr_pm25
-  
+          variables:
+            min: 0
+            max: 200
+            startcolour: rgba(211, 5, 247,0.5)
   roomcardnav:
     icon: |
       [[[
@@ -228,8 +241,8 @@ button_card_templates:
         - filter: drop-shadow(0 0 1.0rem rgb(243,156,15))
         - font-size: 10px
         - background: >
-            [[[ if (states[variables.onoff]?.state == 'on') { return
-            'rgba(200,200,22,0.5)'; }
+            [[[ if (states[variables.onoff]?.state == 'on' || variables.onoff ==
+            'on') { return 'rgba(200,200,22,0.5)'; }
               else { return 'rgba(20,20,20,0.2)'; }
             ]]]
   roomcard2:
@@ -267,15 +280,14 @@ button_card_templates:
               [[[ return variables.btn2_hash; ]]]
             icon: |
               [[[ return variables.btn2_icon; ]]]                              
+      tfukt: |
+        [[[
+          return `
+          <span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${states[variables.temperature_entity].state}</span>
+          <br/>
+          <span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${states[variables.humidity_entity].state}</span>`
 
-      tfukt: >
-          [[[
-            return `
-            <span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${states[variables.temperature_entity].state}</span>
-            <br/>
-            <span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${states[variables.humidity_entity].state}</span>`
-  
-          ]]]
+        ]]]
     variables:
       temperature_entity: null
       humidity_entity: null
@@ -293,38 +305,38 @@ button_card_templates:
         other:
           - padding: 20px
           - border: 0 !important
-        tfukt: 
-        - font-size: 0.8em
-        - padding: 1em
-        - height: 100%
-        - width: 100%
-        - text-align: center
-        - background: |
-            [[[
-              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
-              
-              let tempEntity = states[variables.temperature_entity];                                          
-              let tVal = tempEntity.state;                                
-              
-              let humidEntity = states[variables.humidity_entity];              
-              let hVal = humidEntity.state;                                                    
-              let tValScaled = convertRange(tVal,[15,30],[100,0]);
-              let tempHsla = `hsla(${tValScaled},50%,50%,0.9)`;                                      
-              let hValScaled = convertRange(hVal,[50,100],[130,235])              
-              let fuktHsla = `hsla(${hValScaled},10%,50%,0.9)`;
+        tfukt:
+          - font-size: 0.8em
+          - padding: 1em
+          - height: 100%
+          - width: 100%
+          - text-align: center
+          - background: |
+              [[[
+                function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
+                
+                let tempEntity = states[variables.temperature_entity];                                          
+                let tVal = tempEntity.state;                                
+                
+                let humidEntity = states[variables.humidity_entity];              
+                let hVal = humidEntity.state;                                                    
+                let tValScaled = convertRange(tVal,[15,30],[100,0]);
+                let tempHsla = `hsla(${tValScaled},50%,50%,0.9)`;                                      
+                let hValScaled = convertRange(hVal,[50,100],[130,235])              
+                let fuktHsla = `hsla(${hValScaled},10%,50%,0.9)`;
 
-              let roomHsla = tempHsla;
-              if (variables.roomcolor) {
-                roomHsla = variables.roomcolor;
-              }
-              
-              let output3 = `                      
-              radial-gradient(to left, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%),
-              radial-gradient(to right, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%)              
-              `;              
-              
-              return output3;
-            ]]]
+                let roomHsla = tempHsla;
+                if (variables.roomcolor) {
+                  roomHsla = variables.roomcolor;
+                }
+                
+                let output3 = `                      
+                radial-gradient(to left, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%),
+                radial-gradient(to right, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%)                
+                `;              
+                
+                return output3;
+              ]]]
         tempcard:
           - height: 100%
           - width: 100%
@@ -337,7 +349,7 @@ button_card_templates:
           - display: flex
           - align-items: center
           - justify-content: center
-        btn1:          
+        btn1:
           - height: 100%
           - display: flex
           - align-items: center
@@ -348,8 +360,7 @@ button_card_templates:
           - align-items: center
           - justify-content: center
       grid:
-        - grid-template-areas: >-
-            "n n btn1" "tfukt tfukt btn1" "tfukt tfukt btn2" "i other btn2"
+        - grid-template-areas: '"n n btn1" "tfukt tfukt btn1" "tfukt tfukt btn2" "i other btn2"'
         - grid-template-columns: 1fr 1fr 0.8fr
         - grid-template-rows: 1fr 0.5fr 0.5fr 1fr
       name:
@@ -360,7 +371,6 @@ button_card_templates:
         - font-size: 20px
         - font-weight: 800
         - padding-bottom: 0
-        
         - color: rgba(236, 236, 236,0.8)
         - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
       state:
@@ -368,7 +378,6 @@ button_card_templates:
       img_cell:
         - justify-content: start
         - position: absolute
-        
         - width: 100px;
         - height: 100px;
         - left: 0
@@ -393,17 +402,17 @@ button_card_templates:
         - box-shadow: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
-              let output = "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.38);"              
+              let output = "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.78);"              
               if (!variables.temperature_entity) { return output; }
                let tVal = states[variables.temperature_entity]?.state;                                
               let tValScaled = convertRange(tVal,[15,30],[120,0]);
-              output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
+              //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
               return output;  
             ]]]
         - padding: 15px 15px 15px 15px
         - border-radius: 20px
         - border-width: 0px
-        - min-height: 100px
+        - min-height: 90px
         - background: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
@@ -427,14 +436,15 @@ button_card_templates:
               radial-gradient(at top left, ${roomHsla} 0%, transparent 50%),
               radial-gradient(at top right, ${roomHsla} 0%, transparent 50%),
               radial-gradient(at bottom right, ${roomHsla} 0%, transparent 50%),                                                    
-              radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%)                           
+              radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%),
+              linear-gradient(0deg, transparent 0%, ${roomHsla} 50%, transparent 100%)
               `;
               
               return output3;
             ]]]
   roomcard_nocontrols:
-    template: roomcard2  
-    styles:      
+    template: roomcard2
+    styles:
       grid:
         - grid-template-areas: '"n n n" "i tfukt tfukt"'
         - grid-template-columns: 1fr 0.5fr 1fr
@@ -686,13 +696,19 @@ decluttering_templates:
 views:
   - path: roomcardnew
     background: >-
-      linear-gradient(35deg, rgba(39,114,163,0.9710084717480743) 0%,
-      rgba(4,0,61,0.8533613274411327) 47%, rgba(93,47,144,1) 58%,
-      rgba(14,1,122,0.928991579541973) 100%)  
+            radial-gradient(rgba(57,24,1,0.67) 0%, rgba(206,133,251,0) 100%),
+            linear-gradient(45deg, transparent 0%, rgba(38,87,0,0.61) 100%, rgba(127,176,6,0.51) 100%),
+            linear-gradient(rgba(0,2,140,0.69) 0%, rgba(47,78,94,0.62) 100%),
+            linear-gradient(154deg, rgba(9,133,204,1) 0%, rgba(59,78,240,1) 100%)
+      
     cards:
-      - type: grid
-        square: false
-        columns: 2
+      - type: custom:layout-card
+        layout_type: custom:horizontal-layout
+        layout:
+          max_cols: 2
+          width: 200
+          padding: 5px
+          card_margin: 5px
         cards:
           - type: custom:button-card
             template: roomcard2
@@ -727,8 +743,13 @@ views:
               room_hash: '#kjokken-room'
             name: Kjøkken
             icon: mdi:microwave
-      - square: false
-        type: grid
+      - type: custom:layout-card
+        layout_type: custom:horizontal-layout
+        layout:
+          max_cols: 2
+          width: 200
+          padding: 5px
+          card_margin: 5px
         cards:
           - type: custom:button-card
             template: roomcard2
@@ -753,6 +774,7 @@ views:
               humidity_entity: sensor.kontor_fuktighet
               roomcolor: hsla(299, 50%, 50%, 1)
               btn1_hash: '#al-kamera'
+              btn1_onoff: 'on'
               btn1_icon: mdi:video
               btn2_hash: '#al-media'
               btn2_icon: mdi:speaker
@@ -770,8 +792,13 @@ views:
         cards:
           - type: custom:button-card
             template: aqicard
-      - square: false
-        type: grid
+      - type: custom:layout-card
+        layout_type: custom:horizontal-layout
+        layout:
+          max_cols: 2
+          width: 200
+          padding: 5px
+          card_margin: 5px
         cards:
           - type: custom:button-card
             template: roomcard2
@@ -794,7 +821,7 @@ views:
               temperature_entity: sensor.gjallarhorn_temperature
               humidity_entity: sensor.gjallarhorn_humidity
               motion_entity: binary_sensor.spisestue_any
-              roomcolor: hsla(163, 100%, 27%, 1)
+              roomcolor: hsla(260, 100%, 57%, 1)
               room_hash: '#spisestue-room'
               btn1_hash: '#spisestue-lys'
               btn1_icon: mdi:lamp
