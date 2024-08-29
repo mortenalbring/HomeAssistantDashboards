@@ -1,4 +1,73 @@
 button_card_templates:
+  ratescard:
+    name: Import Rates
+    tap_action:
+      action: navigate
+      navigation_path: /dashboard-solar
+    styles:
+      grid:
+        - grid-template-areas: '"n n n" "rates rates rates"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+      card:
+        - padding: 0
+        - margin: 0
+        - background: rgba(100,1,1,0.3)
+      name:
+        - font-family: Roboto, sans-serif
+        - letter-spacing: .1rem
+        - justify-self: stretch
+        - align-self: start
+        - font-size: 15px
+        - font-weight: 800
+        - padding-bottom: 0
+        - color: rgba(236, 236, 236,0.8)
+        - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)        
+      custom_fields:
+        rates:
+          - margin: 0          
+          - background: none
+          - font-size: 0.5em
+    custom_fields:
+      rates: |
+        [[[
+          let element = states['event.octopus_energy_electricity_18p2053324_1414550002006_current_day_rates'];
+          let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];
+          let maxRate = element.attributes.max_rate;
+          let minRate = element.attributes.min_rate;
+          
+          let output = "<table>";
+          let graph = "<div style=\"width:100%; background-color:none\">";
+          element.attributes.rates.forEach((elem) => {
+            
+            let dateParsed = new Date(Date.parse(elem.start)); 
+          
+            if (dateParsed > new Date()) {
+              let dateParsedStr = dateParsed.getHours() + ":" + String(dateParsed.getMinutes()).padStart(2,"0");            
+              let startDate = dateParsed.toLocaleTimeString().slice(0,-3);
+              let rateValue = parseFloat(elem.value_inc_vat*100).toFixed(2);
+              let ratePerc = ((elem.value_inc_vat / maxRate)*95);
+              if (ratePerc < 10) { ratePerc = 50; }
+              let startColor = 'rgba(40,50,80,0.9)';
+              let endColor = 'rgb(1,100,1)';
+              if (rateValue > 20) { endColor = 'rgb(100,100,1)'; } 
+              if (rateValue > 30) { endColor = 'rgb(200,50,1)'; } 
+              let rowColor = `linear-gradient(to right,${startColor} 1%,${endColor} 50%, ${endColor})`
+              graph = graph + `<div style='padding-left:2px;padding-right:5px;background:${rowColor};text-align:left; width:${ratePerc}%;'>
+              <span style='text-align:left'>${dateParsedStr}</span><span style='float:right;'>${rateValue}p</span>
+              </div>`;
+              output = output + `<tr><td>${startDate}</td><td>${rateValue}</td><td>${ratePerc}</td></tr>`;
+            }
+          });
+          graph = graph + "</div>";
+          output = output + "</table>";
+
+
+          return `<div>${graph}</div>`;
+
+        ]]]
+        
+       
   mediacard:
     variables:
       entity_id: media_player.soverom_hoyttaler
@@ -696,11 +765,11 @@ decluttering_templates:
 views:
   - path: roomcardnew
     background: >-
-            radial-gradient(rgba(57,24,1,0.67) 0%, rgba(206,133,251,0) 100%),
-            linear-gradient(45deg, transparent 0%, rgba(38,87,0,0.61) 100%, rgba(127,176,6,0.51) 100%),
-            linear-gradient(rgba(0,2,140,0.69) 0%, rgba(47,78,94,0.62) 100%),
-            linear-gradient(154deg, rgba(9,133,204,1) 0%, rgba(59,78,240,1) 100%)
-      
+      radial-gradient(rgba(57,24,1,0.67) 0%, rgba(206,133,251,0) 100%),
+      linear-gradient(45deg, transparent 0%, rgba(38,87,0,0.61) 100%,
+      rgba(127,176,6,0.51) 100%), linear-gradient(rgba(0,2,140,0.69) 0%,
+      rgba(47,78,94,0.62) 100%), linear-gradient(154deg, rgba(9,133,204,1) 0%,
+      rgba(59,78,240,1) 100%)
     cards:
       - type: custom:layout-card
         layout_type: custom:horizontal-layout
@@ -1246,3 +1315,9 @@ views:
         cards:
           - type: custom:button-card
             template: solarcard
+      - type: grid
+        square: false
+        columns: 2
+        cards:
+          - type: custom:button-card
+            template: ratescard
