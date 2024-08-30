@@ -22,10 +22,10 @@ button_card_templates:
         - font-weight: 800
         - padding-bottom: 0
         - color: rgba(236, 236, 236,0.8)
-        - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)        
+        - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
       custom_fields:
         rates:
-          - margin: 0          
+          - margin: 0
           - background: none
           - font-size: 0.5em
     custom_fields:
@@ -66,8 +66,6 @@ button_card_templates:
           return `<div>${graph}</div>`;
 
         ]]]
-        
-       
   mediacard:
     variables:
       entity_id: media_player.soverom_hoyttaler
@@ -429,9 +427,9 @@ button_card_templates:
           - align-items: center
           - justify-content: center
       grid:
-        - grid-template-areas: '"n n btn1" "tfukt tfukt btn1" "tfukt tfukt btn2" "i other btn2"'
+        - grid-template-areas: '"n n n" "tfukt tfukt btn1" "tfukt tfukt btn2" "i other btn2"'
         - grid-template-columns: 1fr 1fr 0.8fr
-        - grid-template-rows: 1fr 0.5fr 0.5fr 1fr
+        - grid-template-rows: 0.8fr 0.5fr 0.5fr 0.8fr
       name:
         - font-family: Roboto, sans-serif
         - letter-spacing: .1rem
@@ -440,6 +438,7 @@ button_card_templates:
         - font-size: 20px
         - font-weight: 800
         - padding-bottom: 0
+        - margin-bottom: 0
         - color: rgba(236, 236, 236,0.8)
         - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
       state:
@@ -481,7 +480,8 @@ button_card_templates:
         - padding: 15px 15px 15px 15px
         - border-radius: 20px
         - border-width: 0px
-        - min-height: 90px
+        - min-height: 50px
+        
         - background: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
@@ -609,7 +609,7 @@ decluttering_templates:
       type: vertical-stack
       cards:
         - type: custom:mushroom-light-card
-          entity: light.senglys
+          entity: light.senglys_light
           show_brightness_control: true
           layout: horizontal
           show_color_control: false
