@@ -872,13 +872,7 @@ views:
               room_hash: '#kjokken-room'
             name: Kjøkken
             icon: mdi:microwave
-      - type: custom:layout-card
-        layout_type: custom:horizontal-layout
-        layout:
-          max_cols: 2
-          width: 200
-          padding: 5px
-          card_margin: 5px
+      - type: horizontal-stack
         cards:
           - type: custom:button-card
             template: roomcard2
@@ -921,13 +915,7 @@ views:
         cards:
           - type: custom:button-card
             template: aqicard
-      - type: custom:layout-card
-        layout_type: custom:horizontal-layout
-        layout:
-          max_cols: 2
-          width: 200
-          padding: 5px
-          card_margin: 5px
+      - type: horizontal-stack
         cards:
           - type: custom:button-card
             template: roomcard2
@@ -1408,13 +1396,7 @@ views:
               roomcolor: hsla(189, 66%, 52%, 1)
             name: Baderom
             icon: mdi:shower-head
-      - type: custom:layout-card
-        layout_type: custom:horizontal-layout
-        layout:
-          max_cols: 2
-          width: 200
-          padding: 5px
-          card_margin: 5px
+      - type: horizontal-stack
         cards:
           - type: custom:button-card
             template: ratescard
