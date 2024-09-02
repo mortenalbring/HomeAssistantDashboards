@@ -1,4 +1,49 @@
 button_card_templates:
+  infocard:
+    styles:
+      card:
+        - background: rgba(73, 185, 230,0.1);
+        - border: 0
+        - padding: 0
+      grid:
+        - grid-template-areas: '"morten naomi rute"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+        - gap: 2px 2px
+      morten:
+        - grid-area: 1 / 2 / 2 / 3
+      naomi:
+        - grid-area: 1 / 3 / 2 / 4;
+      rute:
+        - grid-area: 1 / 3 / 2 / 4;
+    custom_fields:
+      morten:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: false
+          icon: mdi:face-man-outline
+          name: Morten
+          entity: person.morten
+      naomi:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          icon: mdi:face-woman
+          show_state: false
+          name: Naomi
+          entity: person.naomi
+      rute:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: false
+          icon: mdi:timetable
+          name: Rute
+          entity: switch.schedule_0c6502
+          tap_action:
+            action: navigate
+            navigation_path: '#rute'
   ratescard:
     name: Import Rates
     tap_action:
@@ -12,7 +57,8 @@ button_card_templates:
       card:
         - padding: 0
         - margin: 0
-        - background: rgba(100,1,1,0.3)
+        - border: 0
+        - background: rgba(100,1,1,0.1)
       name:
         - font-family: Roboto, sans-serif
         - letter-spacing: .1rem
@@ -171,13 +217,13 @@ button_card_templates:
     show_state: true
     styles:
       card:
-        - background: rgba(156,104,0,0.4);
+        - background: rgba(156,104,0,0.1);
         - border: 0
         - padding: 0
       grid:
-        - grid-template-areas: '"solar battery consumption"'
-        - grid-template-columns: 1fr 1fr 1fr
-        - grid-template-rows: 1fr
+        - grid-template-areas: '"solar"  "consumption" "battery" "statustext"'
+        - grid-template-columns: 1fr
+        - grid-template-rows: 1fr 1fr 1fr 1fr
         - gap: 2px 2px
       solar:
         - grid-area: 1 / 2 / 2 / 3
@@ -197,6 +243,7 @@ button_card_templates:
           variables:
             max: 5000
             startcolour: rgba(156,174,0,0.7)
+            endcolour: rgba(255,255,255,0)
       battery:
         card:
           type: custom:button-card
@@ -211,11 +258,25 @@ button_card_templates:
           type: custom:button-card
           template: barscard
           show_state: true
-          name: Usage
+          icon: mdi:home-import-outline
+          name: Consumption
           entity: sensor.lux_home_consumption_live
           variables:
-            max: 2000
+            max: 5000
             startcolour: rgba(150,100,0,0.7)
+            endcolour: rgba(255,255,255,0)
+      statustext:
+        card:
+          type: custom:button-card
+          template: barscard
+          show_state: true
+          name: Grid flow
+          entity: sensor.lux_grid_flow_live
+          variables:
+            min: -4000
+            max: 4000
+            startcolour: rgba(50,200,50,0.7)
+            endcolour: rgba(100,0,0,0.0)
   aqicard:
     show_state: true
     styles:
@@ -481,7 +542,6 @@ button_card_templates:
         - border-radius: 20px
         - border-width: 0px
         - min-height: 50px
-        
         - background: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
@@ -771,13 +831,13 @@ views:
       rgba(47,78,94,0.62) 100%), linear-gradient(154deg, rgba(9,133,204,1) 0%,
       rgba(59,78,240,1) 100%)
     cards:
-      - type: custom:layout-card
-        layout_type: custom:horizontal-layout
-        layout:
-          max_cols: 2
-          width: 200
-          padding: 5px
-          card_margin: 5px
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: custom:button-card
+            template: infocard
+      - type: horizontal-stack
         cards:
           - type: custom:button-card
             template: roomcard2
@@ -1261,6 +1321,45 @@ views:
         cards:
           - type: custom:bubble-card
             card_type: pop-up
+            show_header: false
+            hash: '#rute'
+          - type: custom:scheduler-card
+            include:
+              - automation
+              - binary_sensor
+              - button
+              - calendar
+              - climate
+              - cover
+              - device_tracker
+              - group
+              - input_number
+              - input_select
+              - light
+              - media_player
+              - notify
+              - number
+              - person
+              - scene
+              - script
+              - select
+              - sensor
+              - sun
+              - switch
+              - vacuum
+            exclude: []
+            title: ''
+            time_step: 30
+            display_options:
+              primary_info: default
+              secondary_info:
+                - relative-time
+                - additional-tasks
+              icon: action
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
             hash: '#verksted-room'
             name: Verksted
             icon: mdi:hand-saw
@@ -1309,15 +1408,15 @@ views:
               roomcolor: hsla(189, 66%, 52%, 1)
             name: Baderom
             icon: mdi:shower-head
-      - type: grid
-        square: false
-        columns: 1
-        cards:
-          - type: custom:button-card
-            template: solarcard
-      - type: grid
-        square: false
-        columns: 2
+      - type: custom:layout-card
+        layout_type: custom:horizontal-layout
+        layout:
+          max_cols: 2
+          width: 200
+          padding: 5px
+          card_margin: 5px
         cards:
           - type: custom:button-card
             template: ratescard
+          - type: custom:button-card
+            template: solarcard
