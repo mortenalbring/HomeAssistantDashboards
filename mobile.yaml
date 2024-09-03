@@ -1,4 +1,51 @@
 button_card_templates:
+  personcard:
+    variables:
+      battery_entity: null
+      steps_entity: null
+    custom_fields:
+      steps:
+        card:
+          type: custom:button-card
+          template: barscard
+          variables:
+            max: 10000
+            startcolour: rgba(10,20,200,0.1)            
+          show_name: false
+          show_state: true
+          show_units: false
+          entity: |
+            [[[ return variables.steps_entity ]]]    
+      battery:
+        card:
+          type: custom:button-card          
+          background: none
+          template: barscard
+          variables:
+            startcolour: rgba(10,200,10,0.1)
+          show_name: false
+          show_state: true
+          entity: |
+            [[[ return variables.battery_entity ]]]
+    styles:
+      name:
+        - font-size: 10px
+        - text-align: left
+      card:
+        - background: rgba(73, 185, 230,0.1);
+        - border: 0
+        - padding: 0
+      grid:
+        - grid-template-areas: '"i n n n" "battery battery steps steps"'
+        - grid-template-columns: 1fr 1fr 1fr 1fr
+        - grid-template-rows: 1fr 1fr
+        - gap: 2px 2px
+      i:
+        - grid-area: 1 / 2 / 2 / 3
+      'n':
+        - grid-area: 1 / 3 / 2 / 4;
+      battery:
+        - grid-area: 1 / 3 / 2 / 4;
   infocard:
     styles:
       card:
@@ -20,16 +67,22 @@ button_card_templates:
       morten:
         card:
           type: custom:button-card
-          template: inlinecard
+          template: personcard
+          variables:
+            battery_entity: sensor.pixel_8_pro_battery_level
+            steps_entity: sensor.pixel_8_pro_daily_steps
           show_state: false
-          icon: mdi:face-man-outline
+          icon: mdi:dog
           name: Morten
           entity: person.morten
       naomi:
         card:
           type: custom:button-card
-          template: inlinecard
-          icon: mdi:face-woman
+          template: personcard
+          variables:
+            battery_entity: sensor.pixel_7a_battery_level_2
+            steps_entity: sensor.pixel_7a_daily_steps
+          icon: mdi:horse
           show_state: false
           name: Naomi
           entity: person.naomi
@@ -491,6 +544,7 @@ button_card_templates:
         - grid-template-areas: '"n n n" "tfukt tfukt btn1" "tfukt tfukt btn2" "i other btn2"'
         - grid-template-columns: 1fr 1fr 0.8fr
         - grid-template-rows: 0.8fr 0.5fr 0.5fr 0.8fr
+        
       name:
         - font-family: Roboto, sans-serif
         - letter-spacing: .1rem
@@ -542,6 +596,7 @@ button_card_templates:
         - border-radius: 20px
         - border-width: 0px
         - min-height: 50px
+        
         - background: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
