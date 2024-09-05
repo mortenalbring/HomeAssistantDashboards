@@ -1,33 +1,31 @@
 button_card_templates:
   personcard:
+    tap_action:
+      action: navigate
+      navigation_path: |
+        [[[
+          return variables.navhash;
+        ]]]  
     variables:
       battery_entity: null
       steps_entity: null
     custom_fields:
-      steps:
-        card:
-          type: custom:button-card
-          template: barscard
-          variables:
-            max: 10000
-            startcolour: rgba(10,20,200,0.1)            
-          show_name: false
-          show_state: true
-          show_units: false
-          entity: |
-            [[[ return variables.steps_entity ]]]    
-      battery:
-        card:
-          type: custom:button-card          
-          background: none
-          template: barscard
-          variables:
-            startcolour: rgba(10,200,10,0.1)
-          show_name: false
-          show_state: true
-          entity: |
-            [[[ return variables.battery_entity ]]]
+      steps: |
+        [[[          
+         let icon = states[variables.steps_entity].attributes?.icon;          
+         return `<ha-icon icon="${icon}" style="width:10px;"></ha-icon> ${states[variables.steps_entity].state}`;
+         ]]]
+      battery: |
+        [[[          
+         let icon = states[variables.battery_entity].attributes?.icon;          
+         return `<ha-icon icon="${icon}" style="width:10px;"></ha-icon> ${states[variables.battery_entity].state}%`;
+         ]]]
     styles:
+      custom_fields:
+        steps:
+          - font-size: 10px;
+        battery:
+          - font-size: 10px;
       name:
         - font-size: 10px
         - text-align: left
@@ -71,6 +69,7 @@ button_card_templates:
           variables:
             battery_entity: sensor.pixel_8_pro_battery_level
             steps_entity: sensor.pixel_8_pro_daily_steps
+            navhash: '#morten-card'
           show_state: false
           icon: mdi:dog
           name: Morten
@@ -82,6 +81,7 @@ button_card_templates:
           variables:
             battery_entity: sensor.pixel_7a_battery_level_2
             steps_entity: sensor.pixel_7a_daily_steps
+            navhash: '#napol-card'
           icon: mdi:horse
           show_state: false
           name: Naomi
@@ -235,7 +235,8 @@ button_card_templates:
         - border: 1px solid;
         - background-size: 100% 20px, 100%;
         - border-color: |
-            [[[ return variables.startcolour; ]]]
+            [[[ 
+            return variables.startcolour; ]]]
         - background: |
             [[[              
               var perc = parseInt((entity.state / variables.max) * 100);
@@ -461,14 +462,18 @@ button_card_templates:
               [[[ return variables.btn2_hash; ]]]
             icon: |
               [[[ return variables.btn2_icon; ]]]                              
-      tfukt: |
+      tspan: |
         [[[
           return `
-          <span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${states[variables.temperature_entity].state}</span>
-          <br/>
+          <span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${states[variables.temperature_entity].state}</span>`
+
+        ]]]        
+      fuktspan: |
+        [[[
+          return `
           <span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${states[variables.humidity_entity].state}</span>`
 
-        ]]]
+        ]]]        
     variables:
       temperature_entity: null
       humidity_entity: null
@@ -486,50 +491,18 @@ button_card_templates:
         other:
           - padding: 20px
           - border: 0 !important
-        tfukt:
+        fuktspan:
           - font-size: 0.8em
-          - padding: 1em
           - height: 100%
           - width: 100%
           - text-align: center
-          - background: |
-              [[[
-                function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
-                
-                let tempEntity = states[variables.temperature_entity];                                          
-                let tVal = tempEntity.state;                                
-                
-                let humidEntity = states[variables.humidity_entity];              
-                let hVal = humidEntity.state;                                                    
-                let tValScaled = convertRange(tVal,[15,30],[100,0]);
-                let tempHsla = `hsla(${tValScaled},50%,50%,0.9)`;                                      
-                let hValScaled = convertRange(hVal,[50,100],[130,235])              
-                let fuktHsla = `hsla(${hValScaled},10%,50%,0.9)`;
-
-                let roomHsla = tempHsla;
-                if (variables.roomcolor) {
-                  roomHsla = variables.roomcolor;
-                }
-                
-                let output3 = `                      
-                radial-gradient(to left, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%),
-                radial-gradient(to right, ${tempHsla} 0%, ${fuktHsla} 50%, transparent 80%)                
-                `;              
-                
-                return output3;
-              ]]]
-        tempcard:
+          - background: none
+        tspan:
+          - font-size: 0.8em
           - height: 100%
           - width: 100%
-          - display: flex
-          - align-items: center
-          - justify-content: center
-        fuktcard:
-          - height: 100%
-          - width: 100%
-          - display: flex
-          - align-items: center
-          - justify-content: center
+          - text-align: center
+          - background: none
         btn1:
           - height: 100%
           - display: flex
@@ -541,47 +514,12 @@ button_card_templates:
           - align-items: center
           - justify-content: center
       grid:
-        - grid-template-areas: '"n n n" "tfukt tfukt btn1" "tfukt tfukt btn2" "i other btn2"'
+        - grid-template-areas: '"n n n" "tspan tspan btn1" "fuktspan fuktspan btn2" "i other btn2"'
         - grid-template-columns: 1fr 1fr 0.8fr
         - grid-template-rows: 0.8fr 0.5fr 0.5fr 0.8fr
-        
-      name:
-        - font-family: Roboto, sans-serif
-        - letter-spacing: .1rem
-        - justify-self: stretch
-        - align-self: start
-        - font-size: 20px
-        - font-weight: 800
-        - padding-bottom: 0
-        - margin-bottom: 0
-        - color: rgba(236, 236, 236,0.8)
-        - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
-      state:
-        - display: none
-      img_cell:
-        - justify-content: start
-        - position: absolute
-        - width: 100px;
-        - height: 100px;
-        - left: 0
-        - bottom: 0
-        - margin: 0 0 -30px -30px
-        - background: |
-            [[[            
-              return `radial-gradient(at bottom left, ${variables.roomcolor} 70%, transparent 100%)`;
-            ]]]
-        - border-radius: 500px
-      icon:
-        - width: 40px
-        - color: |
-            [[[
-              if (variables.motion_entity && states[variables.motion_entity]?.state == 'on') {                
-                return "rgba(255,149,1,0.9)";                                    
-              }
-              return "rgba(255,255,255,0.9)";
-            ]]]
-        - opacity: '0.6'
-      card:
+        - border-radius: 20px
+        - margin: 5px
+        - padding-right: 5px
         - box-shadow: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
@@ -592,11 +530,6 @@ button_card_templates:
               //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
               return output;  
             ]]]
-        - padding: 15px 15px 15px 15px
-        - border-radius: 20px
-        - border-width: 0px
-        - min-height: 50px
-        
         - background: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
@@ -625,16 +558,53 @@ button_card_templates:
               `;
               
               return output3;
+            ]]]        
+      name:
+        - font-family: Roboto, sans-serif
+        - letter-spacing: .1rem
+        - justify-self: stretch
+        - align-self: start
+        - font-size: 20px
+        - font-weight: 800
+        - padding-top: 0.5em
+        - padding-bottom: 0
+        - margin-bottom: 0
+        - color: rgba(236, 236, 236,0.8)
+        - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
+      state:
+        - display: none
+      img_cell:
+        - justify-content: start
+        - position: absolute
+        - width: 50px;
+        - height: 50px;
+        - left: 0
+        - bottom: 0
+        - margin: 0 0 5px 5px
+        - border-radius: 500px
+      icon:
+        - width: 40px
+        - color: |
+            [[[
+              if (variables.motion_entity && states[variables.motion_entity]?.state == 'on') {                
+                return "rgba(255,149,1,0.9)";                                    
+              }
+              return "rgba(255,255,255,0.9)";
             ]]]
+        - opacity: '0.6'
+      card:
+        - background: none
+        - border-width: 0px
+        - min-height: 50px
   roomcard_nocontrols:
     template: roomcard2
     styles:
       grid:
-        - grid-template-areas: '"n n n" "i tfukt tfukt"'
+        - grid-template-areas: '"n n n" "i tspan tspan" "i fuktspan fuktspan"'
         - grid-template-columns: 1fr 0.5fr 1fr
-        - grid-template-rows: 1fr 1fr
+        - grid-template-rows: 1fr 1fr 1fr
       card:
-        - min-height: 10px
+        - min-height: 50px
       name:
         - font-size: 15px
         - font-weight: 800
@@ -764,6 +734,24 @@ decluttering_templates:
           template: mediacard
           variables:
             entity_id: media_player.soverom_hoyttaler_2
+  morten-card:
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: person.morten
+            - entity: sensor.pixel_8_pro_battery_level
+            - entity: sensor.pixel_8_pro_daily_steps
+  napol-card:
+    card:
+      type: vertical-stack
+      cards:
+        - type: entities
+          entities:
+            - entity: person.naomi
+            - entity: sensor.pixel_7a_battery_level_2
+            - entity: sensor.pixel_7a_daily_steps
   kontor-enheter:
     card:
       type: vertical-stack
@@ -1085,6 +1073,30 @@ views:
             card_layout: large
           - type: custom:decluttering-card
             template: kontor-enheter
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#morten-card'
+            name: Morten
+            entity: person.morten
+            icon: mdi:dog
+            button_type: state
+            show_state: false
+          - type: custom:decluttering-card
+            template: morten-card
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#napol-card'
+            name: Naomi
+            entity: person.naomi
+            icon: mdi:horse
+            button_type: state
+            show_state: false
+          - type: custom:decluttering-card
+            template: napol-card
       - type: vertical-stack
         cards:
           - type: custom:bubble-card
