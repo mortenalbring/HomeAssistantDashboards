@@ -51,8 +51,8 @@ button_card_templates:
         - border: 0
         - padding: 0
       grid:
-        - grid-template-areas: '"morten naomi rute"'
-        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-areas: '"morten naomi rute lys" '
+        - grid-template-columns: 1fr 1fr 1fr 1fr
         - grid-template-rows: 1fr
         - gap: 2px 2px
       morten:
@@ -60,6 +60,7 @@ button_card_templates:
       naomi:
         - grid-area: 1 / 3 / 2 / 4;
       rute:
+        - height: 100%
         - grid-area: 1 / 3 / 2 / 4;
     custom_fields:
       morten:
@@ -97,6 +98,30 @@ button_card_templates:
           tap_action:
             action: navigate
             navigation_path: '#rute'
+      lys:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: false
+          icon: mdi:timetable
+          name: |
+            [[[
+              var test = states['light.alle_lys'];
+              var entityIds = states['light.alle_lys']?.attributes?.entity_id;
+              console.log("alle lys",entityIds);
+              var lightsOn = 0;
+              for (var i = 0; i < entityIds.length; i++) {
+                var lightState = states[entityIds[i]]?.state;
+                if (lightState == 'on') { lightsOn++; }                
+                            
+              }
+              return `Lys (${lightsOn})`;
+
+            ]]]
+          entity: light.alle_lys
+          tap_action:
+            action: navigate
+            navigation_path: '#all-lights'
   ratescard:
     name: Import Rates
     tap_action:
@@ -496,13 +521,23 @@ button_card_templates:
           - height: 100%
           - width: 100%
           - text-align: center
-          - background: none
-        tspan:
-          - font-size: 0.8em
-          - height: 100%
+          - display: flex
+          - align-items: center
+          - justify-content: center
           - width: 100%
           - text-align: center
           - background: none
+          - color: rgba(200,200,200,0.5);
+        tspan:
+          - font-size: 0.8em
+          - height: 100%
+          - display: flex
+          - align-items: center
+          - justify-content: center
+          - width: 100%
+          - text-align: center
+          - background: none
+          - color: rgba(200,200,200,0.5);
         btn1:
           - height: 100%
           - display: flex
@@ -515,7 +550,7 @@ button_card_templates:
           - justify-content: center
       grid:
         - grid-template-areas: '"n n n" "tspan tspan btn1" "fuktspan fuktspan btn2" "i other btn2"'
-        - grid-template-columns: 1fr 1fr 0.8fr
+        - grid-template-columns: 0.8fr 1fr 0.8fr
         - grid-template-rows: 0.8fr 0.5fr 0.5fr 0.8fr
         - border-radius: 20px
         - margin: 5px
@@ -650,24 +685,36 @@ decluttering_templates:
     card:
       type: vertical-stack
       cards:
-        - type: custom:mushroom-light-card
-          entity: light.stue_stikkontakt
-          show_brightness_control: true
-          layout: horizontal
-          show_color_control: false
-          name: Stue Lampe
-          icon: mdi:lamp
-        - type: custom:mushroom-light-card
-          entity: light.juletree_lys_switch
-          show_brightness_control: true
-          layout: horizontal
-          show_color_control: false
-          icon: mdi:bookshelf
+        - type: horizontal-stack
+          cards:
+            - type: custom:mushroom-light-card
+              entity: light.stue_stikkontakt
+              show_brightness_control: true
+              layout: horizontal
+              show_color_control: false
+              name: Stue Lampe
+              icon: mdi:lamp
+            - type: custom:mushroom-light-card
+              entity: light.juletree_lys_switch
+              show_brightness_control: true
+              layout: horizontal
+              show_color_control: false
+              icon: mdi:bookshelf
         - type: custom:mushroom-light-card
           entity: light.lekelys_light
           show_brightness_control: true
           layout: horizontal
-          show_color_control: false
+          fill_container: true
+          use_light_color: true
+          show_color_control: true
+          icon: mdi:bookshelf
+        - type: custom:mushroom-light-card
+          entity: light.godstol_light
+          show_brightness_control: true
+          layout: horizontal
+          fill_container: true
+          use_light_color: true
+          show_color_control: true
           icon: mdi:bookshelf
   al-media:
     card:
@@ -734,6 +781,21 @@ decluttering_templates:
           template: mediacard
           variables:
             entity_id: media_player.soverom_hoyttaler_2
+  all-lights-card:
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:auto-entities
+          card:
+            type: entities
+          filter:
+            include:
+              - group: light.alle_lys
+                options:
+                  secondary_info: last-changed
+          sort:
+            method: name
+            reverse: false
   morten-card:
     card:
       type: vertical-stack
@@ -741,8 +803,15 @@ decluttering_templates:
         - type: entities
           entities:
             - entity: person.morten
+            - entity: sensor.steam_76561197960958444
             - entity: sensor.pixel_8_pro_battery_level
             - entity: sensor.pixel_8_pro_daily_steps
+            - entity: sensor.steps
+            - entity: sensor.sleep_start_time
+            - entity: sensor.sleep_time_in_bed
+            - entity: sensor.sleep_minutes_asleep
+            - entity: sensor.sleep_minutes_awake
+            - entity: sensor.sleep_efficiency
   napol-card:
     card:
       type: vertical-stack
@@ -764,9 +833,15 @@ decluttering_templates:
           card:
             type: entities
             entities:
+              - entity: binary_sensor.kontor_bevegelsessensor_ias_sone
               - entity: switch.spisestue_skjoteledning_b
               - entity: switch.spisestue_skjoteledning_c
               - entity: switch.kontor_sentral_skjerm
+              - entity: button.grace_grace_rgb_off
+              - entity: button.grace_grace_rgb_grey
+              - entity: button.grace_grace_mediaplaypause
+              - entity: sensor.database_free_space_days_remaining
+              - entity: sensor.database_size_growth_daily_last_period
         - show_name: true
           show_icon: true
           type: button
@@ -1085,6 +1160,18 @@ views:
             show_state: false
           - type: custom:decluttering-card
             template: morten-card
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#all-lights'
+            name: Lys
+            entity: light.alle_lys
+            icon: mdi:light-flood-up
+            button_type: state
+            show_state: false
+          - type: custom:decluttering-card
+            template: all-lights-card
       - type: vertical-stack
         cards:
           - type: custom:bubble-card
