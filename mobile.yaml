@@ -44,6 +44,58 @@ button_card_templates:
         - grid-area: 1 / 3 / 2 / 4;
       battery:
         - grid-area: 1 / 3 / 2 / 4;
+  settingscard:
+    styles:
+      card:
+        - background: rgba(73, 185, 230,0.1);
+        - border: 0
+        - padding: 0
+      grid:
+        - grid-template-areas: '"rute lys"'
+        - grid-template-columns:  1fr 1fr
+        - grid-template-rows: 1fr
+        - gap: 2px 2px
+      morten:
+        - grid-area: 1 / 2 / 2 / 3
+      naomi:
+        - grid-area: 1 / 3 / 2 / 4;
+      rute:
+        - height: 100%
+        - grid-area: 1 / 3 / 2 / 4;
+    custom_fields:
+
+      rute:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: false
+          icon: mdi:timetable
+          name: Rute
+          entity: switch.schedule_0c6502
+          tap_action:
+            action: navigate
+            navigation_path: '#rute'
+      lys:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: false
+          icon: mdi:lightbulb
+          name: |
+            [[[              
+              var entityIds = states['light.alle_lys']?.attributes?.entity_id;              
+              var lightsOn = 0;
+              for (var i = 0; i < entityIds.length; i++) {
+                var lightState = states[entityIds[i]]?.state;
+                if (lightState == 'on') { lightsOn++; }                                          
+              }
+              return `Lys (${lightsOn})`;
+            ]]]
+          entity: light.alle_lys
+          tap_action:
+            action: navigate
+            navigation_path: '#all-lights'  
+  
   infocard:
     styles:
       card:
@@ -51,8 +103,8 @@ button_card_templates:
         - border: 0
         - padding: 0
       grid:
-        - grid-template-areas: '"morten naomi rute lys" '
-        - grid-template-columns: 1fr 1fr 1fr 1fr
+        - grid-template-areas: '"morten naomi" '
+        - grid-template-columns: 1fr 1fr
         - grid-template-rows: 1fr
         - gap: 2px 2px
       morten:
@@ -87,41 +139,7 @@ button_card_templates:
           show_state: false
           name: Naomi
           entity: person.naomi
-      rute:
-        card:
-          type: custom:button-card
-          template: inlinecard
-          show_state: false
-          icon: mdi:timetable
-          name: Rute
-          entity: switch.schedule_0c6502
-          tap_action:
-            action: navigate
-            navigation_path: '#rute'
-      lys:
-        card:
-          type: custom:button-card
-          template: inlinecard
-          show_state: false
-          icon: mdi:timetable
-          name: |
-            [[[
-              var test = states['light.alle_lys'];
-              var entityIds = states['light.alle_lys']?.attributes?.entity_id;
-              console.log("alle lys",entityIds);
-              var lightsOn = 0;
-              for (var i = 0; i < entityIds.length; i++) {
-                var lightState = states[entityIds[i]]?.state;
-                if (lightState == 'on') { lightsOn++; }                
-                            
-              }
-              return `Lys (${lightsOn})`;
 
-            ]]]
-          entity: light.alle_lys
-          tap_action:
-            action: navigate
-            navigation_path: '#all-lights'
   ratescard:
     name: Import Rates
     tap_action:
@@ -489,14 +507,17 @@ button_card_templates:
               [[[ return variables.btn2_icon; ]]]                              
       tspan: |
         [[[
-          return `
-          <span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${states[variables.temperature_entity].state}</span>`
-
+          let stateText = `${states[variables.temperature_entity].state}`;          
+          if (stateText == 'unavailable') { stateText = ''; }
+          return `<span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${stateText}</span>`
         ]]]        
       fuktspan: |
         [[[
+          let stateText = `${states[variables.humidity_entity].state}`;          
+          if (stateText == 'unavailable') { stateText = ''; }
+        
           return `
-          <span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${states[variables.humidity_entity].state}</span>`
+          <span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${stateText}</span>`
 
         ]]]        
     variables:
@@ -527,7 +548,8 @@ button_card_templates:
           - width: 100%
           - text-align: center
           - background: none
-          - color: rgba(200,200,200,0.5);
+          - color: rgba(200,200,200,0.8);
+          - text-shadow: 1px 1px 1px rgba(5,5,5,0.4)
         tspan:
           - font-size: 0.8em
           - height: 100%
@@ -537,7 +559,8 @@ button_card_templates:
           - width: 100%
           - text-align: center
           - background: none
-          - color: rgba(200,200,200,0.5);
+          - color: rgba(200,200,200,0.8);
+          - text-shadow: 1px 1px 1px rgba(5,5,5,0.4)
         btn1:
           - height: 100%
           - display: flex
@@ -559,11 +582,15 @@ button_card_templates:
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
               let output = "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.78);"              
+              let output2 = `4px 4px 2px 3px  hsl(0deg 0% 0% / 0.38), 3px 3px 8px 3px  ${variables.roomcolor.slice(0, -2)}0.5)`;
+              console.log("box-shadow",output2);
+              return output2;
               if (!variables.temperature_entity) { return output; }
                let tVal = states[variables.temperature_entity]?.state;                                
               let tValScaled = convertRange(tVal,[15,30],[120,0]);
               //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
-              return output;  
+              
+              return output2;  
             ]]]
         - background: |
             [[[
@@ -571,9 +598,12 @@ button_card_templates:
               
               let tempEntity = states[variables.temperature_entity];                                          
               let tVal = tempEntity.state;                                
+              console.log(tVal);
+              if (tVal == 'unavailable') { tVal = 0; }
               
               let humidEntity = states[variables.humidity_entity];              
-              let hVal = humidEntity.state;                                                    
+              let hVal = humidEntity.state;           
+              if (hVal == 'unavailable') { hVal = 0; }
               let tValScaled = convertRange(tVal,[15,30],[100,0]);
               let tempHsla = `hsla(${tValScaled},50%,50%,0.5)`;                                      
               let hValScaled = convertRange(hVal,[50,100],[130,235])              
@@ -605,7 +635,7 @@ button_card_templates:
         - padding-bottom: 0
         - margin-bottom: 0
         - color: rgba(236, 236, 236,0.8)
-        - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
+        - text-shadow: 2px 2px 1px rgba(5,5,5,0.9)
       state:
         - display: none
       img_cell:
@@ -903,25 +933,10 @@ decluttering_templates:
     card:
       type: vertical-stack
       cards:
-        - type: custom:mini-media-player
-          entity: media_player.kjokken_hoyttaler
-          artwork: cover-fit
-          group: false
-          shortcuts:
-            columns: 4
-            buttons:
-              - type: script
-                id: script.playnrkp1kjoekken
-                name: P1
-              - type: script
-                id: script.playnrkp1pluskjoekken
-                name: P1+
-              - type: script
-                id: script.playnrkklassiskkjoekken
-                name: Klassisk
-              - type: script
-                id: script.playradio4
-                name: BBC R4
+        - type: custom:button-card
+          template: mediacard
+          variables:
+            entity_id: media_player.kjokken_hoyttaler_2
   kjokken-enheter:
     default:
       - icon: fire
@@ -951,10 +966,13 @@ views:
     cards:
       - type: grid
         square: false
-        columns: 1
+        columns: 2
         cards:
           - type: custom:button-card
             template: infocard
+          - type: custom:button-card
+            template: settingscard
+            
       - type: horizontal-stack
         cards:
           - type: custom:button-card
@@ -964,7 +982,7 @@ views:
               humidity_entity: sensor.zone_fuktighet
               motion_entity: binary_sensor.kontor_bevegelsessensor_occupancy
               name: Kontor
-              roomcolor: hsla(17, 50%, 50%, 0.8)
+              roomcolor: hsla(17, 50%, 50%, 1)
               btn1_hash: '#kontor-lys'
               btn1_icon: mdi:lamp
               btn1_onoff: light.kontor_magic
@@ -1023,9 +1041,6 @@ views:
             name: Anna-Lisbeth
             icon: mdi:elephant
             entity: sensor.kontor_temperatur
-            styles:
-              name:
-                - font-size: 0.9em
         columns: 2
       - type: grid
         square: false
@@ -1069,9 +1084,7 @@ views:
               action: navigate
               navigation_path: '#spisestue-room'
             show_state: true
-            styles:
-              name:
-                - font-size: 1.0em
+
         columns: 2
       - type: vertical-stack
         cards:
