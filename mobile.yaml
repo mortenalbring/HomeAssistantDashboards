@@ -52,7 +52,7 @@ button_card_templates:
         - padding: 0
       grid:
         - grid-template-areas: '"rute lys"'
-        - grid-template-columns:  1fr 1fr
+        - grid-template-columns: 1fr 1fr
         - grid-template-rows: 1fr
         - gap: 2px 2px
       morten:
@@ -94,7 +94,7 @@ button_card_templates:
           entity: light.alle_lys
           tap_action:
             action: navigate
-            navigation_path: '#all-lights'  
+            navigation_path: '#all-lights'
   
   infocard:
     styles:
@@ -177,13 +177,13 @@ button_card_templates:
           let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];
           let maxRate = element.attributes.max_rate;
           let minRate = element.attributes.min_rate;
-          
+        
           let output = "<table>";
           let graph = "<div style=\"width:100%; background-color:none\">";
           element.attributes.rates.forEach((elem) => {
-            
+        
             let dateParsed = new Date(Date.parse(elem.start)); 
-          
+        
             if (dateParsed > new Date()) {
               let dateParsedStr = dateParsed.getHours() + ":" + String(dateParsed.getMinutes()).padStart(2,"0");            
               let startDate = dateParsed.toLocaleTimeString().slice(0,-3);
@@ -284,7 +284,7 @@ button_card_templates:
             [[[              
               var perc = parseInt((entity.state / variables.max) * 100);
               if (isNaN(perc)) { perc = 0; }
-              
+            
               var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour}, ${variables.startcolour} ${perc}%, ${variables.endcolour}, ${variables.endcolour} 100%)`;              
               return grad;
             ]]]
@@ -531,7 +531,7 @@ button_card_templates:
       room_hash: ''
       other: |
         [[[ return ""; ]]]
-          
+    
     styles:
       custom_fields:
         other:
@@ -589,18 +589,18 @@ button_card_templates:
                let tVal = states[variables.temperature_entity]?.state;                                
               let tValScaled = convertRange(tVal,[15,30],[120,0]);
               //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
-              
+            
               return output2;  
             ]]]
         - background: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
-              
+            
               let tempEntity = states[variables.temperature_entity];                                          
               let tVal = tempEntity.state;                                
               console.log(tVal);
               if (tVal == 'unavailable') { tVal = 0; }
-              
+            
               let humidEntity = states[variables.humidity_entity];              
               let hVal = humidEntity.state;           
               if (hVal == 'unavailable') { hVal = 0; }
@@ -613,7 +613,7 @@ button_card_templates:
               if (variables.roomcolor) {
                 roomHsla = variables.roomcolor;
               }
-              
+            
               let output3 = `                      
               radial-gradient(at top left, ${roomHsla} 0%, transparent 50%),
               radial-gradient(at top right, ${roomHsla} 0%, transparent 50%),
@@ -621,7 +621,7 @@ button_card_templates:
               radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%),
               linear-gradient(0deg, transparent 0%, ${roomHsla} 50%, transparent 100%)
               `;
-              
+            
               return output3;
             ]]]        
       name:
@@ -972,7 +972,7 @@ views:
             template: infocard
           - type: custom:button-card
             template: settingscard
-            
+
       - type: horizontal-stack
         cards:
           - type: custom:button-card
@@ -1502,7 +1502,7 @@ views:
               - sun
               - switch
               - vacuum
-            exclude: []
+            exclude: [ ]
             title: ''
             time_step: 30
             display_options:

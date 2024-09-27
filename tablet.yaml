@@ -99,10 +99,10 @@ button_card_templates:
                     let c = 0;
                     while(c < 5) {      
                      let percentKey = (c/5);
-                     
+            
                      let hval = 20 + ( 244 * ( percentKey ) );  
                      console.log("percentKey",percentKey,"hval",hval);
-                     
+            
                      output = output + "hsla(" + hval + ",60%,50%,0.9),";
                      c++;
                     }
@@ -124,19 +124,19 @@ button_card_templates:
             t = entity.attributes.current_temperature
           }          
           text = parseInt(t) + '°C';
-          
-
+        
+        
           if (variables.humidity_entity) {
             ftext = parseInt(variables.humidity_entity) + '%';            
           }
-          
+        
          if (states['input_select.tablet_display_type'].state == 'Heatmap') {                
                   return `<span>` + text + `</span>`
          }         
          if (states['input_select.tablet_display_type'].state == 'Humiditymap') {
                  return `<span>` + ftext + `</span>`
          }           
-                   
+        
           return `<span>` + text + `</span>`;
         ]]]
     variables:
@@ -166,7 +166,7 @@ button_card_templates:
                 function getHslFromTemp(t, opacity) {                       
                    let tempMax = 25;                 
                    let tempMin = 10;
-                   
+            
                    if (t > tempMax) { t = tempMax; }
                    if (t < tempMin) { t = tempMin; }
                    let percentTemp = (t - tempMin) / (tempMax - tempMin);                   
@@ -178,13 +178,13 @@ button_card_templates:
                    let humidityMax = 100;                 
                    let humidityMin = 0;                   
                    let percentHumid = (h - humidityMin) / (humidityMax - humidityMin);                                      
-                   
+            
                    let hval = 20 + (244 * (percentHumid));                   
                    let hsl = "hsla(" + hval + ",60%,50%," + opacity + ")";                   
                    return hsl;                   
                 }  
-                
-                
+            
+            
                 function getHumidityMapGradient() {
                   var humidityGradientOutput = "rgba(200,200,200,0.0)";
 
@@ -195,7 +195,7 @@ button_card_templates:
                    if (variables.outdoor) {                   
                      return "radial-gradient(closest-side," + hsl + " 50%," + end + ")";          
                    }
-                    
+            
                     humidityGradientOutput = radialGradient;                    
                   }
 
@@ -238,7 +238,7 @@ button_card_templates:
                 if (tabletDisplayType == 'Humiditymap') {
                   output = getHumidityMapGradient();            
                 }                
-                                                   
+            
                  return output;
             ]]]
       name:
@@ -285,7 +285,7 @@ views:
   - theme: Tablet
     type: panel
     title: Tablet
-    badges: []
+    badges: [ ]
     cards:
       - type: picture-elements
         image: /local/fp_both_blank.png
@@ -616,7 +616,7 @@ views:
                   var entityThree = {entityId: 'climate.wiser_hallway', value: states['climate.wiser_hallway'].attributes.current_temperature, x: '50', y: '5'};                  
                   return [ entityOne, entityTwo, entityThree ];
                 ]]]
-                        
+            
             styles:
               card:
                 - width: 150px
@@ -721,9 +721,9 @@ views:
 
           - type: custom:webrtc-camera
             style:
-                    top: 150px
-                    left: 740px
-                    width: 400px          
+              top: 150px
+              left: 740px
+              width: 400px
             url: rtsp://homeass:homeass@192.168.1.165:554/stream1
             ui: false
             muted: false
