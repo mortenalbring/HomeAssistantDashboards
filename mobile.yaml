@@ -511,32 +511,32 @@ button_card_templates:
               [[[ return variables.btn2_hash; ]]]
             icon: |
               [[[ return variables.btn2_icon; ]]]                              
-      tspan: |
-        [[[
-          let stateText = `${states[variables.temperature_entity].state}`;          
-          if (stateText == 'unavailable') { stateText = ''; }
-          return `<span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${stateText}</span>`
-        ]]]        
-      fuktspan: |
-        [[[
-          let stateText = `${states[variables.humidity_entity].state}`;          
-          if (stateText == 'unavailable') { stateText = ''; }
 
-          return `
-          <span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${stateText}</span>`
-        ]]]        
-
-      other: |
+      infospan: |
         [[[
+          let content = '';
+          let tText = `${states[variables.temperature_entity].state}`;          
+          if (tText == 'unavailable') { tText = ''; }
+          content = content + `<span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${tText}</span>`;
+          
+          let fText = `${states[variables.humidity_entity].state}`;          
+          if (fText == 'unavailable') { fText = ''; }
+          content = content + `<br/><span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${fText}</span>`
           let text = "";
           if (variables.media_entity) {
             console.log("media entity", states[variables.media_entity]);
             if (states[variables.media_entity].attributes && states[variables.media_entity].attributes?.media_title) {
               text = states[variables.media_entity].attributes?.media_title;
-              return `<span>${text}</span>`;
+              content = content + `<br/><div style="font-size: 0.8em;"><marquee behavior=scroll scrollamount=1>${text}</marquee></div>`;
             }
-          }        
-          return `<span></span>`;
+          }
+          
+          return content;
+        ]]]
+
+      blank: | 
+        [[[
+          return '';
         ]]]
         
     variables:
@@ -550,35 +550,16 @@ button_card_templates:
       btn2_onoff: null
       room_hash: ''
       other: |
-        [[[ 
-          let text = "";
-          if (variables.media_entity) {
-            console.log("media entity", states[variables.media_entity]);
-            if (states[variables.media_entity].attributes && states[variables.media_entity].attributes?.media_title) {
-              text = states[variables.media_entity].attributes?.media_title;
-            }
-          }
-          
-        
-        return ""; ]]]
+        [[[ return ""; ]]]
     styles:
       custom_fields:
         other:
           - padding: 20px
           - border: 0 !important
-        fuktspan:
+        infospan:
           - font-size: 0.8em
-          - height: 100%
-          - width: 100%
-          - text-align: center
-          - display: flex
-          - align-items: center
-          - justify-content: center
-          - width: 100%
-          - text-align: center
-          - background: none
-          - color: rgba(200,200,200,0.8);
-          - text-shadow: 1px 1px 1px rgba(5,5,5,0.4)
+          
+            
         tspan:
           - font-size: 0.8em
           - height: 100%
@@ -601,7 +582,7 @@ button_card_templates:
           - align-items: center
           - justify-content: center
       grid:
-        - grid-template-areas: '"n n n" "tspan tspan btn1" "fuktspan fuktspan btn2" "i other btn2"'
+        - grid-template-areas: '"n n n" "infospan infospan btn1" "infospan infospan btn2" "i blank btn2"'
         - grid-template-columns: 0.8fr 1fr 0.8fr
         - grid-template-rows: 0.8fr 0.5fr 0.5fr 0.8fr
         - border-radius: 20px
@@ -693,7 +674,7 @@ button_card_templates:
     template: roomcard2
     styles:
       grid:
-        - grid-template-areas: '"n n n" "tspan tspan fuktspan" "i other other"'
+        - grid-template-areas: '"n n n" "infospan infospan infospan" "i blank blank"'
         - grid-template-columns: 1fr 0.5fr 1fr
         - grid-template-rows: 1fr 1fr 1fr
       card:
