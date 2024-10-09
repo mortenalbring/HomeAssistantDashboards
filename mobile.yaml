@@ -51,19 +51,25 @@ button_card_templates:
         - border: 0
         - padding: 0
       grid:
-        - grid-template-areas: '"rute lys"'
-        - grid-template-columns: 1fr 1fr
+        - grid-template-areas: '"rute lys enheter"'
+        - grid-template-columns: 1fr 1fr 1fr
         - grid-template-rows: 1fr
         - gap: 2px 2px
-      morten:
-        - grid-area: 1 / 2 / 2 / 3
-      naomi:
-        - grid-area: 1 / 3 / 2 / 4;
       rute:
-        - height: 100%
         - grid-area: 1 / 3 / 2 / 4;
     custom_fields:
-
+    
+      enheter:
+        card:
+          type: custom:button-card
+          template: inlinecard
+          show_state: false
+          icon: mdi:devices
+          name: Enheter          
+          tap_action:
+            action: navigate
+            navigation_path: '#enheter'
+    
       rute:
         card:
           type: custom:button-card
@@ -95,7 +101,6 @@ button_card_templates:
           tap_action:
             action: navigate
             navigation_path: '#all-lights'
-  
   infocard:
     styles:
       card:
@@ -115,6 +120,7 @@ button_card_templates:
         - height: 100%
         - grid-area: 1 / 3 / 2 / 4;
     custom_fields:
+
       morten:
         card:
           type: custom:button-card
@@ -139,7 +145,6 @@ button_card_templates:
           show_state: false
           name: Naomi
           entity: person.naomi
-
   ratescard:
     name: Import Rates
     tap_action:
@@ -153,14 +158,15 @@ button_card_templates:
       card:
         - padding: 0
         - margin: 0
-        - border: 0
-        - background: rgba(100,1,1,0.1)
+        - border: rgba(73, 185, 230,0.1);
+        - background: rgba(73, 185, 230,0.1);
+        
       name:
         - font-family: Roboto, sans-serif
         - letter-spacing: .1rem
         - justify-self: stretch
         - align-self: start
-        - font-size: 15px
+        - font-size: 12px
         - font-weight: 800
         - padding-bottom: 0
         - color: rgba(236, 236, 236,0.8)
@@ -177,13 +183,13 @@ button_card_templates:
           let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];
           let maxRate = element.attributes.max_rate;
           let minRate = element.attributes.min_rate;
-        
+
           let output = "<table>";
           let graph = "<div style=\"width:100%; background-color:none\">";
           element.attributes.rates.forEach((elem) => {
-        
+
             let dateParsed = new Date(Date.parse(elem.start)); 
-        
+
             if (dateParsed > new Date()) {
               let dateParsedStr = dateParsed.getHours() + ":" + String(dateParsed.getMinutes()).padStart(2,"0");            
               let startDate = dateParsed.toLocaleTimeString().slice(0,-3);
@@ -284,7 +290,7 @@ button_card_templates:
             [[[              
               var perc = parseInt((entity.state / variables.max) * 100);
               if (isNaN(perc)) { perc = 0; }
-            
+
               var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour}, ${variables.startcolour} ${perc}%, ${variables.endcolour}, ${variables.endcolour} 100%)`;              
               return grad;
             ]]]
@@ -515,23 +521,46 @@ button_card_templates:
         [[[
           let stateText = `${states[variables.humidity_entity].state}`;          
           if (stateText == 'unavailable') { stateText = ''; }
-        
+
           return `
           <span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${stateText}</span>`
-
         ]]]        
+
+      other: |
+        [[[
+          let text = "";
+          if (variables.media_entity) {
+            console.log("media entity", states[variables.media_entity]);
+            if (states[variables.media_entity].attributes && states[variables.media_entity].attributes?.media_title) {
+              text = states[variables.media_entity].attributes?.media_title;
+              return `<span>${text}</span>`;
+            }
+          }        
+          return `<span></span>`;
+        ]]]
+        
     variables:
       temperature_entity: null
       humidity_entity: null
       motion_entity: null
+      media_entity: null
       btn1_hash: null
       btn1_onoff: null
       btn2_hash: null
       btn2_onoff: null
       room_hash: ''
       other: |
-        [[[ return ""; ]]]
-    
+        [[[ 
+          let text = "";
+          if (variables.media_entity) {
+            console.log("media entity", states[variables.media_entity]);
+            if (states[variables.media_entity].attributes && states[variables.media_entity].attributes?.media_title) {
+              text = states[variables.media_entity].attributes?.media_title;
+            }
+          }
+          
+        
+        return ""; ]]]
     styles:
       custom_fields:
         other:
@@ -582,25 +611,24 @@ button_card_templates:
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
               let output = "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.78);"              
-              let output2 = `4px 4px 2px 3px  hsl(0deg 0% 0% / 0.38), 3px 3px 8px 3px  ${variables.roomcolor.slice(0, -2)}0.5)`;
-              console.log("box-shadow",output2);
+              let output2 = `4px 4px 2px 3px  hsl(0deg 0% 0% / 0.38), 3px 3px 8px 3px  ${variables.roomcolor.slice(0, -2)}0.5)`;              
               return output2;
               if (!variables.temperature_entity) { return output; }
                let tVal = states[variables.temperature_entity]?.state;                                
               let tValScaled = convertRange(tVal,[15,30],[120,0]);
               //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
-            
+
               return output2;  
             ]]]
         - background: |
             [[[
               function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
-            
+
               let tempEntity = states[variables.temperature_entity];                                          
               let tVal = tempEntity.state;                                
-              console.log(tVal);
+              
               if (tVal == 'unavailable') { tVal = 0; }
-            
+
               let humidEntity = states[variables.humidity_entity];              
               let hVal = humidEntity.state;           
               if (hVal == 'unavailable') { hVal = 0; }
@@ -613,7 +641,7 @@ button_card_templates:
               if (variables.roomcolor) {
                 roomHsla = variables.roomcolor;
               }
-            
+
               let output3 = `                      
               radial-gradient(at top left, ${roomHsla} 0%, transparent 50%),
               radial-gradient(at top right, ${roomHsla} 0%, transparent 50%),
@@ -621,7 +649,7 @@ button_card_templates:
               radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%),
               linear-gradient(0deg, transparent 0%, ${roomHsla} 50%, transparent 100%)
               `;
-            
+
               return output3;
             ]]]        
       name:
@@ -665,11 +693,12 @@ button_card_templates:
     template: roomcard2
     styles:
       grid:
-        - grid-template-areas: '"n n n" "i tspan tspan" "i fuktspan fuktspan"'
+        - grid-template-areas: '"n n n" "tspan tspan fuktspan" "i other other"'
         - grid-template-columns: 1fr 0.5fr 1fr
         - grid-template-rows: 1fr 1fr 1fr
       card:
         - min-height: 50px
+        
       name:
         - font-size: 15px
         - font-weight: 800
@@ -966,13 +995,12 @@ views:
     cards:
       - type: grid
         square: false
-        columns: 2
+        columns: 1
         cards:
           - type: custom:button-card
             template: infocard
           - type: custom:button-card
             template: settingscard
-
       - type: horizontal-stack
         cards:
           - type: custom:button-card
@@ -998,6 +1026,7 @@ views:
               temperature_entity: sensor.kjoekken_temperatur
               humidity_entity: sensor.kjoekken_fuktighet
               motion_entity: binary_sensor.kjoekken_bevegelsessensor_occupancy
+              media_entity: media_player.kjokken_hoyttaler
               name: Kjøkken
               roomcolor: hsla(138, 10%, 50%, 1)
               btn1_hash: '#kjokken-media'
@@ -1084,7 +1113,6 @@ views:
               action: navigate
               navigation_path: '#spisestue-room'
             show_state: true
-
         columns: 2
       - type: vertical-stack
         cards:
@@ -1502,7 +1530,7 @@ views:
               - sun
               - switch
               - vacuum
-            exclude: [ ]
+            exclude: []
             title: ''
             time_step: 30
             display_options:
@@ -1531,6 +1559,77 @@ views:
               touch_pinch_zoom: true
               touch_tap_drag_zoom: true
               persist: true
+          - type: entities
+            entities:
+              - light.verksted_lys
+              - sensor.verksted_fuktighet
+              - sensor.verksted_temperatur
+
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#enheter'
+            name: Enheter
+            icon: mdi:devices
+            card_layout: large
+          - type: entities
+            entities:
+              - switch.dehumidifier_switch
+          - type: custom:auto-entities
+            view_layout:
+              grid-area: main
+            card:
+              show_header_toggle: false
+              title: Offline
+              type: entities
+            filter:
+              include:
+                - domain: sensor
+                  integration: zha
+                  entity_id: "*_batteri"
+                  state: unavailable
+                - domain: sensor
+                  integration: zha
+                  entity_id: "*_batteri"
+                  state: unknown
+                - domain: sensor
+                  integration: zha
+                  entity_id: "*_power"
+                  state: unavailable
+                - domain: sensor
+                  integration: zha
+                  entity_id: "*_power"
+                  state: unknown
+            show_empty: false
+          - type: custom:auto-entities
+            card:
+              type: entities
+              state_color: true
+            filter:
+              include:
+                - entity_id: binary_sensor.*ias_*
+                  options:
+                    secondary_info: last-changed
+                - entity_id: binary_sensor.*occupancy
+                  options:
+                    secondary_info: last-changed
+                - entity_id: binary_sensor.*beveg*
+                  options:
+                    secondary_info: last-changed
+              exclude:
+                - domain: binary_sensor
+                  state: unknown
+                - domain: binary_sensor
+                  state: unavailable
+            sort:
+              method: last_changed
+              reverse: true
+            unique: true
+
+              
+            
+              
       - square: false
         columns: 3
         type: grid
