@@ -58,18 +58,16 @@ button_card_templates:
       rute:
         - grid-area: 1 / 3 / 2 / 4;
     custom_fields:
-    
       enheter:
         card:
           type: custom:button-card
           template: inlinecard
           show_state: false
           icon: mdi:devices
-          name: Enheter          
+          name: Enheter
           tap_action:
             action: navigate
             navigation_path: '#enheter'
-    
       rute:
         card:
           type: custom:button-card
@@ -120,7 +118,6 @@ button_card_templates:
         - height: 100%
         - grid-area: 1 / 3 / 2 / 4;
     custom_fields:
-
       morten:
         card:
           type: custom:button-card
@@ -160,7 +157,6 @@ button_card_templates:
         - margin: 0
         - border: rgba(73, 185, 230,0.1);
         - background: rgba(73, 185, 230,0.1);
-        
       name:
         - font-family: Roboto, sans-serif
         - letter-spacing: .1rem
@@ -179,6 +175,8 @@ button_card_templates:
     custom_fields:
       rates: |
         [[[
+          let test = states['binary_sensor.octopus_energy_target_nightly_lux_charge'];
+          console.log("test",test);
           let element = states['event.octopus_energy_electricity_18p2053324_1414550002006_current_day_rates'];
           let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];
           let maxRate = element.attributes.max_rate;
@@ -511,7 +509,6 @@ button_card_templates:
               [[[ return variables.btn2_hash; ]]]
             icon: |
               [[[ return variables.btn2_icon; ]]]                              
-
       infospan: |
         [[[
           let content = '';
@@ -533,12 +530,10 @@ button_card_templates:
           
           return content;
         ]]]
-
-      blank: | 
+      blank: |
         [[[
           return '';
         ]]]
-        
     variables:
       temperature_entity: null
       humidity_entity: null
@@ -558,8 +553,6 @@ button_card_templates:
           - border: 0 !important
         infospan:
           - font-size: 0.8em
-          
-            
         tspan:
           - font-size: 0.8em
           - height: 100%
@@ -582,7 +575,9 @@ button_card_templates:
           - align-items: center
           - justify-content: center
       grid:
-        - grid-template-areas: '"n n n" "infospan infospan btn1" "infospan infospan btn2" "i blank btn2"'
+        - grid-template-areas: >-
+            "n n n" "infospan infospan btn1" "infospan infospan btn2" "i blank
+            btn2"
         - grid-template-columns: 0.8fr 1fr 0.8fr
         - grid-template-rows: 0.8fr 0.5fr 0.5fr 0.8fr
         - border-radius: 20px
@@ -679,7 +674,6 @@ button_card_templates:
         - grid-template-rows: 1fr 1fr 1fr
       card:
         - min-height: 50px
-        
       name:
         - font-size: 15px
         - font-weight: 800
@@ -1545,7 +1539,6 @@ views:
               - light.verksted_lys
               - sensor.verksted_fuktighet
               - sensor.verksted_temperatur
-
       - type: vertical-stack
         cards:
           - type: custom:bubble-card
@@ -1568,19 +1561,19 @@ views:
               include:
                 - domain: sensor
                   integration: zha
-                  entity_id: "*_batteri"
+                  entity_id: '*_batteri'
                   state: unavailable
                 - domain: sensor
                   integration: zha
-                  entity_id: "*_batteri"
+                  entity_id: '*_batteri'
                   state: unknown
                 - domain: sensor
                   integration: zha
-                  entity_id: "*_power"
+                  entity_id: '*_power'
                   state: unavailable
                 - domain: sensor
                   integration: zha
-                  entity_id: "*_power"
+                  entity_id: '*_power'
                   state: unknown
             show_empty: false
           - type: custom:auto-entities
@@ -1607,10 +1600,6 @@ views:
               method: last_changed
               reverse: true
             unique: true
-
-              
-            
-              
       - square: false
         columns: 3
         type: grid
