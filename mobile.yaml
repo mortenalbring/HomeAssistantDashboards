@@ -176,7 +176,7 @@ button_card_templates:
       rates: |
         [[[
           let test = states['binary_sensor.octopus_energy_target_nightly_lux_charge'];
-          console.log("test",test);
+          
           let element = states['event.octopus_energy_electricity_18p2053324_1414550002006_current_day_rates'];
           let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];
           let maxRate = element.attributes.max_rate;
@@ -514,11 +514,23 @@ button_card_templates:
           let content = '';
           let tText = `${states[variables.temperature_entity].state}`;          
           if (tText == 'unavailable') { tText = ''; }
-          content = content + `<span><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${tText}</span>`;
+          let tColor = 'rgba(200,200,180,0.5)';
+          if (Number(tText) < 15) { tColor = 'rgba(100,200,255,0.8)'; }
+          if (Number(tText) > 18) { tColor = 'rgba(255,200,100,0.8)'; }
+          if (Number(tText) > 20) { tColor = 'rgba(255,100,100,0.9)'; }
+
+
+          content = content + `<span style="color: ${tColor}"><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${tText}</span>`;
+
           
           let fText = `${states[variables.humidity_entity].state}`;          
           if (fText == 'unavailable') { fText = ''; }
-          content = content + `<br/><span><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${fText}</span>`
+          let fColor = 'rgba(200,200,180,0.5)';          
+          if (Number(fText) > 70) { fColor = 'rgba(100,200,255,0.9)'; }
+          if (Number(fText) > 80) { fColor = 'rgba(0,0,255,1.0)'; }
+                  
+          
+          content = content + `<br/><span style="color:${fColor}"><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${fText}</span>`
           let text = "";
           if (variables.media_entity) {
             console.log("media entity", states[variables.media_entity]);
@@ -553,6 +565,11 @@ button_card_templates:
           - border: 0 !important
         infospan:
           - font-size: 0.8em
+          - display: flex
+          - flex-direction: column
+          - align-items: center
+          - justify-content: space-around
+          - height: 90%
         tspan:
           - font-size: 0.8em
           - height: 100%
@@ -638,8 +655,22 @@ button_card_templates:
         - padding-top: 0.5em
         - padding-bottom: 0
         - margin-bottom: 0
-        - color: rgba(236, 236, 236,0.8)
-        - text-shadow: 2px 2px 1px rgba(5,5,5,0.9)
+        - color: |
+            [[[
+              let defaultcolor = 'rgba(236, 236, 236,0.8)';
+
+              let transform = `${variables.roomcolor.slice(0, -2)}0.9)`;
+              console.log("trans",transform);
+              return defaultcolor;
+            ]]]
+        - text-shadow: |
+            [[[
+              let transform = `${variables.roomcolor.slice(0, -2)}0.9)`;
+
+              let tshadow = `1px 1px 3px ${transform}`;
+              return tshadow;
+
+            ]]]
       state:
         - display: none
       img_cell:
@@ -968,14 +999,10 @@ views:
       rgba(47,78,94,0.62) 100%), linear-gradient(154deg, rgba(9,133,204,1) 0%,
       rgba(59,78,240,1) 100%)
     cards:
-      - type: grid
-        square: false
-        columns: 1
-        cards:
-          - type: custom:button-card
-            template: infocard
-          - type: custom:button-card
-            template: settingscard
+      - type: custom:button-card
+        template: infocard
+      - type: custom:button-card
+        template: settingscard
       - type: horizontal-stack
         cards:
           - type: custom:button-card
@@ -1310,32 +1337,6 @@ views:
                 template: al-media
               - type: custom:decluttering-card
                 template: al-kamera
-              - type: grid
-                square: false
-                columns: 2
-                cards:
-                  - type: tile
-                    entity: counter.al_ibuprofen
-                    tap_action:
-                      action: more-info
-                    icon: mdi:medication
-                    vertical: false
-                    hide_state: false
-                    state_content:
-                      - last-changed
-                      - state
-                      - last-updated
-                  - type: tile
-                    entity: counter.al_paracetamol
-                    tap_action:
-                      action: more-info
-                    icon: mdi:medication
-                    vertical: false
-                    hide_state: false
-                    state_content:
-                      - last-changed
-                      - state
-                      - last-updated
               - square: false
                 type: grid
                 cards:
@@ -1638,3 +1639,4 @@ views:
             template: ratescard
           - type: custom:button-card
             template: solarcard
+    type: custom:vertical-layout
