@@ -680,7 +680,7 @@ button_card_templates:
         - height: 50px;
         - left: 0
         - bottom: 0
-        - margin: 0 0 5px 5px
+        - margin: 0 0 15px 15px
         - border-radius: 500px
       icon:
         - width: 40px
