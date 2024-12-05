@@ -238,22 +238,44 @@ button_card_templates:
                 data:
                   media_player_entity_id: |
                     [[[ return variables.entity_id; ]]]                      
-                  media_id: NRK P1
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1
                 name: P1
               - type: script
                 id: script.mass_media_play
                 data:
                   media_player_entity_id: |
                     [[[ return variables.entity_id; ]]]                      
-                  media_id: NRK P1+
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1pluss
                 name: P1+
+                
               - type: script
                 id: script.mass_media_play
                 data:
                   media_player_entity_id: |
                     [[[ return variables.entity_id; ]]]                      
-                  media_id: NRK Klassisk
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p2
+                name: P2
+              - type: script
+                id: script.mass_media_play
+                data:
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/klassisk
                 name: Klassisk
+              - type: script
+                id: script.mass_media_play
+                data:
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/folkemusikk
+                name: NRK Folk
+              - type: script
+                id: script.mass_media_play
+                data:
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/jazz
+                name: NRK Jazz
               - type: script
                 id: script.mass_media_play
                 data:
@@ -790,7 +812,7 @@ decluttering_templates:
   al-kamera:
     card:
       type: custom:webrtc-camera
-      url: rtsp://homeass:homeass@192.168.1.165:554/stream1
+      url: rtsp://homeass:homeass@192.168.1.166:554/stream1
       ui: false
       muted: false
       digital_ptz:
