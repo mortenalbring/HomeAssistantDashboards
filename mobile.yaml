@@ -734,6 +734,29 @@ button_card_templates:
         - font-weight: 800
         - padding-bottom: 0.5em
 decluttering_templates:
+  auto-lights:
+    variables:
+      - area
+    card:
+      type: custom:auto-entities
+      card:
+        type: grid
+        columns: 2
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - domain: light
+            options:
+              type: custom:mushroom-light-card
+              show_brightness_control: true
+              layout: horizontal
+        exclude:
+          - state: unavailable
+          - domain: light
+            not:
+              area: '[[area]]'
+              label: Fysisk
   spisestue-media:
     card:
       type: vertical-stack
@@ -948,25 +971,10 @@ decluttering_templates:
     card:
       type: vertical-stack
       cards:
-        - type: custom:auto-entities
-          card:
-            type: grid
-            columns: 2
-            square: false
-          card_param: cards
-          filter:
-            include:
-              - domain: light
-                options:
-                  type: custom:mushroom-light-card
-                  show_brightness_control: true
-                  layout: horizontal
-            exclude:
-              - state: unavailable
-              - domain: light
-                not:
-                  area: Kontor
-                  label: Fysisk      
+        - type: custom:decluttering-card
+          template: auto-lights
+          variables:
+            - area: Kontor
         - type: custom:mushroom-light-card
           entity: light.kontor_magic
           show_brightness_control: true
