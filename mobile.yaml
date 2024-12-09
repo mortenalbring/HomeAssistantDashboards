@@ -1,105 +1,122 @@
 button_card_templates:
-  personcard:
-    tap_action:
-      action: navigate
-      navigation_path: |
-        [[[
-          return variables.navhash;
-        ]]]  
-    variables:
-      battery_entity: null
-      steps_entity: null
+  aqicard:
     custom_fields:
-      steps: |
-        [[[          
-         let icon = states[variables.steps_entity].attributes?.icon;          
-         return `<ha-icon icon="${icon}" style="width:10px;"></ha-icon> ${states[variables.steps_entity].state}`;
-         ]]]
-      battery: |
-        [[[          
-         let icon = states[variables.battery_entity].attributes?.icon;          
-         return `<ha-icon icon="${icon}" style="width:10px;"></ha-icon> ${states[variables.battery_entity].state}%`;
-         ]]]
+      c02:
+        card:
+          entity: sensor.awair_lr_co2
+          name: CO2
+          show_state: true
+          template: barscard
+          type: custom:button-card
+          variables:
+            max: 1200
+            min: 400
+            startcolour: rgba(252, 186, 3,0.2)
+      pm25:
+        card:
+          entity: sensor.awair_lr_pm25
+          name: PM 2.5
+          show_state: true
+          template: barscard
+          type: custom:button-card
+          variables:
+            max: 200
+            min: 0
+            startcolour: rgba(211, 5, 247,0.5)
+      score:
+        card:
+          entity: sensor.awair_lr_score
+          icon: mdi:percent
+          name: Air
+          show_state: true
+          template: barscard
+          type: custom:button-card
+          variables:
+            startcolour: rgba(73, 185, 230,0.5)
+      tvoc:
+        card:
+          entity: sensor.awair_lr_voc
+          name: VOC
+          show_state: true
+          template: barscard
+          type: custom:button-card
+          variables:
+            max: 10000
+            min: 500
+            startcolour: rgba(252, 69, 3,0.5)
+    show_state: true
     styles:
-      custom_fields:
-        steps:
-          - font-size: 10px;
-        battery:
-          - font-size: 10px;
-      name:
-        - font-size: 10px
-        - text-align: left
-      card:
-        - background: rgba(73, 185, 230,0.1);
-        - border: 0
-        - padding: 0
-      grid:
-        - grid-template-areas: '"i n n n" "battery battery steps steps"'
-        - grid-template-columns: 1fr 1fr 1fr 1fr
-        - grid-template-rows: 1fr 1fr
-        - gap: 2px 2px
-      i:
-        - grid-area: 1 / 2 / 2 / 3
-      'n':
-        - grid-area: 1 / 3 / 2 / 4;
       battery:
         - grid-area: 1 / 3 / 2 / 4;
-  settingscard:
-    styles:
       card:
-        - background: rgba(73, 185, 230,0.1);
+        - background: rgba(73, 185, 230,0.5);
         - border: 0
         - padding: 0
+      consumption:
+        - grid-area: 1 / 3 / 2 / 4;
       grid:
-        - grid-template-areas: '"rute lys enheter"'
-        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-areas: '"score c02 tvoc pm25"'
+        - grid-template-columns: 1fr 1fr 1fr 1fr
         - grid-template-rows: 1fr
         - gap: 2px 2px
-      rute:
-        - grid-area: 1 / 3 / 2 / 4;
-    custom_fields:
-      enheter:
-        card:
-          type: custom:button-card
-          template: inlinecard
-          show_state: false
-          icon: mdi:devices
-          name: Enheter
-          tap_action:
-            action: navigate
-            navigation_path: '#enheter'
-      rute:
-        card:
-          type: custom:button-card
-          template: inlinecard
-          show_state: false
-          icon: mdi:timetable
-          name: Rute
-          entity: switch.schedule_0c6502
-          tap_action:
-            action: navigate
-            navigation_path: '#rute'
-      lys:
-        card:
-          type: custom:button-card
-          template: inlinecard
-          show_state: false
-          icon: mdi:lightbulb
-          name: |
-            [[[              
-              var entityIds = states['light.alle_lys']?.attributes?.entity_id;              
-              var lightsOn = 0;
-              for (var i = 0; i < entityIds.length; i++) {
-                var lightState = states[entityIds[i]]?.state;
-                if (lightState == 'on') { lightsOn++; }                                          
-              }
-              return `Lys (${lightsOn})`;
-            ]]]
-          entity: light.alle_lys
-          tap_action:
-            action: navigate
-            navigation_path: '#all-lights'
+      solar:
+        - grid-area: 1 / 2 / 2 / 3
+  barscard:
+    styles:
+      card:
+        - height: 100%;
+        - border: 1px solid;
+        - background-size: 100% 20px, 100%;
+        - border-color: "[[[ \nreturn variables.startcolour; ]]]\n"
+        - background: "[[[              \n  var perc = parseInt((entity.state / variables.max)\
+            \ * 100);\n  if (isNaN(perc)) { perc = 0; }\n\n  var grad = `linear-gradient(to\
+            \ right, ${variables.startcolour} 0%, ${variables.startcolour}, ${variables.startcolour}\
+            \ ${perc}%, ${variables.endcolour}, ${variables.endcolour} 100%)`;   \
+            \           \n  return grad;\n]]]\n"
+      grid:
+        - grid-template-areas: '"i n n" "i s s"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+      name:
+        - text-align: left
+        - font-size: 11px
+        - width: 100%
+      state:
+        - text-align: left
+        - width: 100%
+        - font-size: 11px
+        - font-weight: bold
+    variables:
+      endcolour: rgba(20,20,20,0.3)
+      max: 100
+      min: 0
+      startcolour: blue
   infocard:
+    custom_fields:
+      morten:
+        card:
+          entity: person.morten
+          icon: mdi:dog
+          name: Morten
+          show_state: false
+          template: personcard
+          type: custom:button-card
+          variables:
+            battery_entity: sensor.pixel_8_pro_battery_level
+            navhash: '#morten-card'
+            steps_entity: sensor.pixel_8_pro_daily_steps
+      naomi:
+        card:
+          entity: person.naomi
+          icon: mdi:horse
+          name: Naomi
+          show_state: false
+          template: personcard
+          type: custom:button-card
+          variables:
+            battery_entity: sensor.pixel_7a_battery_level_2
+            navhash: '#napol-card'
+            steps_entity: sensor.pixel_7a_daily_steps
     styles:
       card:
         - background: rgba(73, 185, 230,0.1);
@@ -117,46 +134,172 @@ button_card_templates:
       rute:
         - height: 100%
         - grid-area: 1 / 3 / 2 / 4;
-    custom_fields:
-      morten:
-        card:
-          type: custom:button-card
-          template: personcard
-          variables:
-            battery_entity: sensor.pixel_8_pro_battery_level
-            steps_entity: sensor.pixel_8_pro_daily_steps
-            navhash: '#morten-card'
-          show_state: false
-          icon: mdi:dog
-          name: Morten
-          entity: person.morten
-      naomi:
-        card:
-          type: custom:button-card
-          template: personcard
-          variables:
-            battery_entity: sensor.pixel_7a_battery_level_2
-            steps_entity: sensor.pixel_7a_daily_steps
-            navhash: '#napol-card'
-          icon: mdi:horse
-          show_state: false
-          name: Naomi
-          entity: person.naomi
-  ratescard:
-    name: Import Rates
-    tap_action:
-      action: navigate
-      navigation_path: /dashboard-solar
+  inlinecard:
     styles:
+      card:
+        - height: 100%;
+        - background: rgba(20,20,20,0.3);
       grid:
-        - grid-template-areas: '"n n n" "rates rates rates"'
+        - grid-template-areas: '"i n n" "i s s"'
         - grid-template-columns: 1fr 1fr 1fr
         - grid-template-rows: 1fr
+      name:
+        - text-align: left
+        - font-size: 11px
+        - width: 100%
+      state:
+        - text-align: left
+        - width: 100%
+        - font-size: 11px
+        - font-weight: bold
+  mediacard:
+    custom_fields:
+      player:
+        card:
+          artwork: cover-fit
+          entity: |
+            [[[
+              return variables.entity_id;
+            ]]]
+          group: false
+          shortcuts:
+            buttons:
+              - data:
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1
+                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
+                    \                   \n"
+                id: script.mass_media_play
+                name: P1
+                type: script
+              - data:
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1pluss
+                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
+                    \                   \n"
+                id: script.mass_media_play
+                name: P1+
+                type: script
+              - data:
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p2
+                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
+                    \                   \n"
+                id: script.mass_media_play
+                name: P2
+                type: script
+              - data:
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/klassisk
+                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
+                    \                   \n"
+                id: script.mass_media_play
+                name: Klassisk
+                type: script
+              - data:
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/folkemusikk
+                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
+                    \                   \n"
+                id: script.mass_media_play
+                name: NRK Folk
+                type: script
+              - data:
+                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/jazz
+                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
+                    \                   \n"
+                id: script.mass_media_play
+                name: NRK Jazz
+                type: script
+              - data:
+                  media_id: BBC Radio 4
+                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
+                    \                   \n"
+                id: script.mass_media_play
+                name: Radio 4
+                type: script
+            columns: 4
+          type: custom:mini-media-player
+    styles:
+      grid:
+        - grid-template-areas: '"i n n" "player player player"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+    variables:
+      entity_id: media_player.soverom_hoyttaler
+  personcard:
+    custom_fields:
+      battery: "[[[          \n let icon = states[variables.battery_entity].attributes?.icon;\
+        \          \n return `<ha-icon icon=\"${icon}\" style=\"width:10px;\"></ha-icon>\
+        \ ${states[variables.battery_entity].state}%`;\n ]]]\n"
+      steps: "[[[          \n let icon = states[variables.steps_entity].attributes?.icon;\
+        \          \n return `<ha-icon icon=\"${icon}\" style=\"width:10px;\"></ha-icon>\
+        \ ${states[variables.steps_entity].state}`;\n ]]]\n"
+    styles:
+      battery:
+        - grid-area: 1 / 3 / 2 / 4;
+      card:
+        - background: rgba(73, 185, 230,0.1);
+        - border: 0
+        - padding: 0
+      custom_fields:
+        battery:
+          - font-size: 10px;
+        steps:
+          - font-size: 10px;
+      grid:
+        - grid-template-areas: '"i n n n" "battery battery steps steps"'
+        - grid-template-columns: 1fr 1fr 1fr 1fr
+        - grid-template-rows: 1fr 1fr
+        - gap: 2px 2px
+      i:
+        - grid-area: 1 / 2 / 2 / 3
+      n:
+        - grid-area: 1 / 3 / 2 / 4;
+      name:
+        - font-size: 10px
+        - text-align: left
+    tap_action:
+      action: navigate
+      navigation_path: "[[[\n  return variables.navhash;\n]]]  \n"
+    variables:
+      battery_entity: null
+      steps_entity: null
+  ratescard:
+    custom_fields:
+      rates: "[[[\n  let test = states['binary_sensor.octopus_energy_target_nightly_lux_charge'];\n\
+        \n  let element = states['event.octopus_energy_electricity_18p2053324_1414550002006_current_day_rates'];\n\
+        \  let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];\n\
+        \  let maxRate = element.attributes.max_rate;\n  let minRate = element.attributes.min_rate;\n\
+        \n  let output = \"<table>\";\n  let graph = \"<div style=\\\"width:100%;\
+        \ background-color:none\\\">\";\n  element.attributes.rates.forEach((elem)\
+        \ => {\n\n    let dateParsed = new Date(Date.parse(elem.start)); \n\n    if\
+        \ (dateParsed > new Date()) {\n      let dateParsedStr = dateParsed.getHours()\
+        \ + \":\" + String(dateParsed.getMinutes()).padStart(2,\"0\");           \
+        \ \n      let startDate = dateParsed.toLocaleTimeString().slice(0,-3);\n \
+        \     let rateValue = parseFloat(elem.value_inc_vat*100).toFixed(2);\n   \
+        \   let ratePerc = ((elem.value_inc_vat / maxRate)*95);\n      if (ratePerc\
+        \ < 10) { ratePerc = 50; }\n      let startColor = 'rgba(40,50,80,0.9)';\n\
+        \      let endColor = 'rgb(1,100,1)';\n      if (rateValue > 20) { endColor\
+        \ = 'rgb(100,100,1)'; } \n      if (rateValue > 30) { endColor = 'rgb(200,50,1)';\
+        \ } \n      let rowColor = `linear-gradient(to right,${startColor} 1%,${endColor}\
+        \ 50%, ${endColor})`\n      graph = graph + `<div style='padding-left:2px;padding-right:5px;background:${rowColor};text-align:left;\
+        \ width:${ratePerc}%;'>\n      <span style='text-align:left'>${dateParsedStr}</span><span\
+        \ style='float:right;'>${rateValue}p</span>\n      </div>`;\n      output\
+        \ = output + `<tr><td>${startDate}</td><td>${rateValue}</td><td>${ratePerc}</td></tr>`;\n\
+        \    }\n  });\n  graph = graph + \"</div>\";\n  output = output + \"</table>\"\
+        ;\n\n\n  return `<div>${graph}</div>`;\n\n]]]\n"
+    name: Import Rates
+    styles:
       card:
         - padding: 0
         - margin: 0
         - border: rgba(73, 185, 230,0.1);
         - background: rgba(73, 185, 230,0.1);
+      custom_fields:
+        rates:
+          - margin: 0
+          - background: none
+          - font-size: 0.5em
+      grid:
+        - grid-template-areas: '"n n n" "rates rates rates"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
       name:
         - font-family: Roboto, sans-serif
         - letter-spacing: .1rem
@@ -167,426 +310,78 @@ button_card_templates:
         - padding-bottom: 0
         - color: rgba(236, 236, 236,0.8)
         - text-shadow: 1px 1px 8px rgba(5,5,5,0.9)
-      custom_fields:
-        rates:
-          - margin: 0
-          - background: none
-          - font-size: 0.5em
-    custom_fields:
-      rates: |
-        [[[
-          let test = states['binary_sensor.octopus_energy_target_nightly_lux_charge'];
-          
-          let element = states['event.octopus_energy_electricity_18p2053324_1414550002006_current_day_rates'];
-          let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];
-          let maxRate = element.attributes.max_rate;
-          let minRate = element.attributes.min_rate;
-
-          let output = "<table>";
-          let graph = "<div style=\"width:100%; background-color:none\">";
-          element.attributes.rates.forEach((elem) => {
-
-            let dateParsed = new Date(Date.parse(elem.start)); 
-
-            if (dateParsed > new Date()) {
-              let dateParsedStr = dateParsed.getHours() + ":" + String(dateParsed.getMinutes()).padStart(2,"0");            
-              let startDate = dateParsed.toLocaleTimeString().slice(0,-3);
-              let rateValue = parseFloat(elem.value_inc_vat*100).toFixed(2);
-              let ratePerc = ((elem.value_inc_vat / maxRate)*95);
-              if (ratePerc < 10) { ratePerc = 50; }
-              let startColor = 'rgba(40,50,80,0.9)';
-              let endColor = 'rgb(1,100,1)';
-              if (rateValue > 20) { endColor = 'rgb(100,100,1)'; } 
-              if (rateValue > 30) { endColor = 'rgb(200,50,1)'; } 
-              let rowColor = `linear-gradient(to right,${startColor} 1%,${endColor} 50%, ${endColor})`
-              graph = graph + `<div style='padding-left:2px;padding-right:5px;background:${rowColor};text-align:left; width:${ratePerc}%;'>
-              <span style='text-align:left'>${dateParsedStr}</span><span style='float:right;'>${rateValue}p</span>
-              </div>`;
-              output = output + `<tr><td>${startDate}</td><td>${rateValue}</td><td>${ratePerc}</td></tr>`;
-            }
-          });
-          graph = graph + "</div>";
-          output = output + "</table>";
-
-
-          return `<div>${graph}</div>`;
-
-        ]]]
-  mediacard:
-    variables:
-      entity_id: media_player.soverom_hoyttaler
-    styles:
-      grid:
-        - grid-template-areas: '"i n n" "player player player"'
-        - grid-template-columns: 1fr 1fr 1fr
-        - grid-template-rows: 1fr
-    custom_fields:
-      player:
-        card:
-          type: custom:mini-media-player
-          entity: |
-            [[[
-              return variables.entity_id;
-            ]]]
-          artwork: cover-fit
-          group: false
-          shortcuts:
-            columns: 4
-            buttons:
-              - type: script
-                id: script.mass_media_play
-                data:
-                  media_player_entity_id: |
-                    [[[ return variables.entity_id; ]]]                      
-                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1
-                name: P1
-              - type: script
-                id: script.mass_media_play
-                data:
-                  media_player_entity_id: |
-                    [[[ return variables.entity_id; ]]]                      
-                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1pluss
-                name: P1+
-              - type: script
-                id: script.mass_media_play
-                data:
-                  media_player_entity_id: |
-                    [[[ return variables.entity_id; ]]]                      
-                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p2
-                name: P2
-              - type: script
-                id: script.mass_media_play
-                data:
-                  media_player_entity_id: |
-                    [[[ return variables.entity_id; ]]]                      
-                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/klassisk
-                name: Klassisk
-              - type: script
-                id: script.mass_media_play
-                data:
-                  media_player_entity_id: |
-                    [[[ return variables.entity_id; ]]]                      
-                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/folkemusikk
-                name: NRK Folk
-              - type: script
-                id: script.mass_media_play
-                data:
-                  media_player_entity_id: |
-                    [[[ return variables.entity_id; ]]]                      
-                  media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/jazz
-                name: NRK Jazz
-              - type: script
-                id: script.mass_media_play
-                data:
-                  media_player_entity_id: |
-                    [[[ return variables.entity_id; ]]]                      
-                  media_id: BBC Radio 4
-                name: Radio 4
-  barscard:
-    variables:
-      min: 0
-      max: 100
-      startcolour: blue
-      endcolour: rgba(20,20,20,0.3)
-    styles:
-      state:
-        - text-align: left
-        - width: 100%
-        - font-size: 11px
-        - font-weight: bold
-      name:
-        - text-align: left
-        - font-size: 11px
-        - width: 100%
-      card:
-        - height: 100%;
-        - border: 1px solid;
-        - background-size: 100% 20px, 100%;
-        - border-color: |
-            [[[ 
-            return variables.startcolour; ]]]
-        - background: |
-            [[[              
-              var perc = parseInt((entity.state / variables.max) * 100);
-              if (isNaN(perc)) { perc = 0; }
-
-              var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour}, ${variables.startcolour} ${perc}%, ${variables.endcolour}, ${variables.endcolour} 100%)`;              
-              return grad;
-            ]]]
-      grid:
-        - grid-template-areas: '"i n n" "i s s"'
-        - grid-template-columns: 1fr 1fr 1fr
-        - grid-template-rows: 1fr
-  inlinecard:
-    styles:
-      state:
-        - text-align: left
-        - width: 100%
-        - font-size: 11px
-        - font-weight: bold
-      name:
-        - text-align: left
-        - font-size: 11px
-        - width: 100%
-      card:
-        - height: 100%;
-        - background: rgba(20,20,20,0.3);
-      grid:
-        - grid-template-areas: '"i n n" "i s s"'
-        - grid-template-columns: 1fr 1fr 1fr
-        - grid-template-rows: 1fr
-  solarcard:
-    show_state: true
-    styles:
-      card:
-        - background: rgba(156,104,0,0.1);
-        - border: 0
-        - padding: 0
-      grid:
-        - grid-template-areas: '"solar"  "consumption" "battery" "statustext"'
-        - grid-template-columns: 1fr
-        - grid-template-rows: 1fr 1fr 1fr 1fr
-        - gap: 2px 2px
-      solar:
-        - grid-area: 1 / 2 / 2 / 3
-      battery:
-        - grid-area: 1 / 3 / 2 / 4;
-      consumption:
-        - grid-area: 1 / 3 / 2 / 4;
-    custom_fields:
-      solar:
-        card:
-          type: custom:button-card
-          template: barscard
-          show_state: true
-          icon: mdi:sun-wireless
-          name: Solar
-          entity: sensor.lux_solar_output_live
-          variables:
-            max: 5000
-            startcolour: rgba(156,174,0,0.7)
-            endcolour: rgba(255,255,255,0)
-      battery:
-        card:
-          type: custom:button-card
-          template: barscard
-          show_state: true
-          name: Battery
-          entity: sensor.lux_battery
-          variables:
-            startcolour: rgba(0,104,0,1)
-      consumption:
-        card:
-          type: custom:button-card
-          template: barscard
-          show_state: true
-          icon: mdi:home-import-outline
-          name: Consumption
-          entity: sensor.lux_home_consumption_live
-          variables:
-            max: 5000
-            startcolour: rgba(150,100,0,0.7)
-            endcolour: rgba(255,255,255,0)
-      statustext:
-        card:
-          type: custom:button-card
-          template: barscard
-          show_state: true
-          name: Grid flow
-          entity: sensor.lux_grid_flow_live
-          variables:
-            min: -4000
-            max: 4000
-            startcolour: rgba(50,200,50,0.7)
-            endcolour: rgba(100,0,0,0.0)
-  aqicard:
-    show_state: true
-    styles:
-      card:
-        - background: rgba(73, 185, 230,0.5);
-        - border: 0
-        - padding: 0
-      grid:
-        - grid-template-areas: '"score c02 tvoc pm25"'
-        - grid-template-columns: 1fr 1fr 1fr 1fr
-        - grid-template-rows: 1fr
-        - gap: 2px 2px
-      solar:
-        - grid-area: 1 / 2 / 2 / 3
-      battery:
-        - grid-area: 1 / 3 / 2 / 4;
-      consumption:
-        - grid-area: 1 / 3 / 2 / 4;
-    custom_fields:
-      score:
-        card:
-          type: custom:button-card
-          template: barscard
-          show_state: true
-          icon: mdi:percent
-          name: Air
-          entity: sensor.awair_lr_score
-          variables:
-            startcolour: rgba(73, 185, 230,0.5)
-      c02:
-        card:
-          type: custom:button-card
-          template: barscard
-          show_state: true
-          name: CO2
-          entity: sensor.awair_lr_co2
-          variables:
-            min: 400
-            max: 1200
-            startcolour: rgba(252, 186, 3,0.2)
-      tvoc:
-        card:
-          type: custom:button-card
-          template: barscard
-          show_state: true
-          name: VOC
-          entity: sensor.awair_lr_voc
-          variables:
-            min: 500
-            max: 10000
-            startcolour: rgba(252, 69, 3,0.5)
-      pm25:
-        card:
-          type: custom:button-card
-          template: barscard
-          show_state: true
-          name: PM 2.5
-          entity: sensor.awair_lr_pm25
-          variables:
-            min: 0
-            max: 200
-            startcolour: rgba(211, 5, 247,0.5)
-  roomcardnav:
-    icon: |
-      [[[
-        return variables.icon;
-      ]]]
     tap_action:
       action: navigate
-      navigation_path: |
-        [[[
-          return variables.navhash;
-        ]]]
-    variables:
-      onoff: ''
-      navhash: ''
-      icon: ''
-    size: 100%
-    styles:
-      icon:
-        - transform: scale(0.4)
-        - font-size: 2px !important;
-        - color: >
-            [[[ if (states[variables.onoff]?.state == 'on') { return
-            'rgba(30,30,30,0.95)'; }
-              else { return 'rgba(20,20,20,0.5)'; }
-            ]]]                     
-      card:
-        - border-radius: 20px
-        - filter: drop-shadow(0 0 1.0rem rgb(243,156,15))
-        - font-size: 10px
-        - background: >
-            [[[ if (states[variables.onoff]?.state == 'on' || variables.onoff ==
-            'on') { return 'rgba(200,200,22,0.5)'; }
-              else { return 'rgba(20,20,20,0.2)'; }
-            ]]]
+      navigation_path: /dashboard-solar
   roomcard2:
-    group_expand: true
-    tap_action:
-      action: navigate
-      navigation_path: |
-        [[[
-          return variables.room_hash;
-        ]]]
     custom_fields:
-      btn1:
-        card:
-          type: custom:button-card
-          triggers_update: |
-            [[[ return variables.btn1_onoff; ]]]
-          template: roomcardnav
-          variables:
-            card_area: |
-              [[[ return variables.card_area ]]]
-            onoff: |
-              [[[ return variables.btn1_onoff; ]]]
-            navhash: |
-              [[[ return variables.btn1_hash; ]]]
-            icon: |
-              [[[ return variables.btn1_icon; ]]]
-      btn2:
-        card:
-          type: custom:button-card
-          triggers_update: |
-            [[[ return variables.btn2_onoff; ]]]          
-          template: roomcardnav
-          variables:
-            onoff: |
-              [[[ return variables.btn2_onoff; ]]]          
-            navhash: |
-              [[[ return variables.btn2_hash; ]]]
-            icon: |
-              [[[ return variables.btn2_icon; ]]]                              
-      infospan: |
-        [[[
-          let content = '';
-          let tText = `${states[variables.temperature_entity].state}`;          
-          if (tText == 'unavailable') { tText = ''; }
-          let tColor = 'rgba(200,200,180,0.5)';
-          if (Number(tText) < 15) { tColor = 'rgba(100,200,255,0.8)'; }
-          if (Number(tText) > 18) { tColor = 'rgba(255,200,100,0.8)'; }
-          if (Number(tText) > 20) { tColor = 'rgba(255,100,100,0.9)'; }
-
-
-          content = content + `<span style="color: ${tColor}"><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${tText}</span>`;
-
-          
-          let fText = `${states[variables.humidity_entity].state}`;          
-          if (fText == 'unavailable') { fText = ''; }
-          let fColor = 'rgba(200,200,180,0.5)';          
-          if (Number(fText) > 70) { fColor = 'rgba(100,200,255,0.9)'; }
-          if (Number(fText) > 80) { fColor = 'rgba(0,0,255,1.0)'; }
-                  
-          
-          content = content + `<br/><span style="color:${fColor}"><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${fText}</span>`
-          let text = "";
-          if (variables.media_entity) {
-            console.log("media entity", states[variables.media_entity]);
-            if (states[variables.media_entity].attributes && states[variables.media_entity].attributes?.media_title) {
-              text = states[variables.media_entity].attributes?.media_title;
-              content = content + `<br/><div style="font-size: 0.8em;"><marquee behavior=scroll scrollamount=1>${text}</marquee></div>`;
-            }
-          }
-          
-          return content;
-        ]]]
       blank: |
         [[[
           return '';
         ]]]
-    variables:
-      card_area: null
-      temperature_entity: null
-      humidity_entity: null
-      motion_entity: null
-      media_entity: null
-      btn1_hash: null
-      btn1_onoff: null
-      btn2_hash: null
-      btn2_onoff: null
-      room_hash: ''
-      other: |
-        [[[ return ""; ]]]
+      btn1:
+        card:
+          template: roomcardnav
+          triggers_update: |
+            [[[ return variables.btn1_onoff; ]]]
+          type: custom:button-card
+          variables:
+            card_area: |
+              [[[ return variables.card_area ]]]
+            icon: |
+              [[[ return variables.btn1_icon; ]]]
+            navhash: |
+              [[[ return variables.btn1_hash; ]]]
+            onoff: |
+              [[[ return variables.btn1_onoff; ]]]
+      btn2:
+        card:
+          template: roomcardnav
+          triggers_update: "[[[ return variables.btn2_onoff; ]]]          \n"
+          type: custom:button-card
+          variables:
+            icon: "[[[ return variables.btn2_icon; ]]]                           \
+              \   \n"
+            navhash: |
+              [[[ return variables.btn2_hash; ]]]
+            onoff: "[[[ return variables.btn2_onoff; ]]]          \n"
+      infospan: "[[[\n  let content = '';\n  let tText = `${states[variables.temperature_entity].state}`;\
+        \          \n  if (tText == 'unavailable') { tText = ''; }\n  let tColor =\
+        \ 'rgba(200,200,180,0.5)';\n  if (Number(tText) < 15) { tColor = 'rgba(100,200,255,0.8)';\
+        \ }\n  if (Number(tText) > 18) { tColor = 'rgba(255,200,100,0.8)'; }\n  if\
+        \ (Number(tText) > 20) { tColor = 'rgba(255,100,100,0.9)'; }\n\n\n  content\
+        \ = content + `<span style=\"color: ${tColor}\"><ha-icon icon=\"mdi:thermometer\"\
+        \ style=\"width: 12px; height: 12px;\"></ha-icon>${tText}</span>`;\n\n\n \
+        \ let fText = `${states[variables.humidity_entity].state}`;          \n  if\
+        \ (fText == 'unavailable') { fText = ''; }\n  let fColor = 'rgba(200,200,180,0.5)';\
+        \          \n  if (Number(fText) > 70) { fColor = 'rgba(100,200,255,0.9)';\
+        \ }\n  if (Number(fText) > 80) { fColor = 'rgba(0,0,255,1.0)'; }\n\n\n  content\
+        \ = content + `<br/><span style=\"color:${fColor}\"><ha-icon icon=\"mdi:water-percent\"\
+        \ style=\"width: 12px; height: 12px;\"></ha-icon>${fText}</span>`\n  let text\
+        \ = \"\";\n  if (variables.media_entity) {\n    console.log(\"media entity\"\
+        , states[variables.media_entity]);\n    if (states[variables.media_entity].attributes\
+        \ && states[variables.media_entity].attributes?.media_title) {\n      text\
+        \ = states[variables.media_entity].attributes?.media_title;\n      content\
+        \ = content + `<br/><div style=\"font-size: 0.8em;\"><marquee behavior=scroll\
+        \ scrollamount=1>${text}</marquee></div>`;\n    }\n  }\n\n  return content;\n\
+        ]]]\n"
+    group_expand: true
     styles:
+      card:
+        - background: none
+        - border-width: 0px
+        - min-height: 50px
       custom_fields:
-        other:
-          - padding: 20px
-          - border: 0 !important
+        btn1:
+          - height: 100%
+          - display: flex
+          - align-items: center
+          - justify-content: center
+        btn2:
+          - height: 100%
+          - display: flex
+          - align-items: center
+          - justify-content: center
         infospan:
           - font-size: 0.8em
           - display: flex
@@ -594,6 +389,9 @@ button_card_templates:
           - align-items: center
           - justify-content: space-around
           - height: 90%
+        other:
+          - padding: 20px
+          - border: 0 !important
         tspan:
           - font-size: 0.8em
           - height: 100%
@@ -605,70 +403,59 @@ button_card_templates:
           - background: none
           - color: rgba(200,200,200,0.8);
           - text-shadow: 1px 1px 1px rgba(5,5,5,0.4)
-        btn1:
-          - height: 100%
-          - display: flex
-          - align-items: center
-          - justify-content: center
-        btn2:
-          - height: 100%
-          - display: flex
-          - align-items: center
-          - justify-content: center
       grid:
-        - grid-template-areas: >-
-            "n n n" "infospan infospan btn1" "infospan infospan btn2" "i blank
-            btn2"
+        - grid-template-areas: '"n n n" "infospan infospan btn1" "infospan infospan
+            btn2" "i blank btn2"'
         - grid-template-columns: 0.8fr 1fr 0.8fr
         - grid-template-rows: 0.8fr 0.5fr 0.5fr 0.8fr
         - border-radius: 20px
         - margin: 5px
         - padding-right: 5px
-        - box-shadow: |
-            [[[
-              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
-              let output = "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.78);"              
-              let output2 = `4px 4px 2px 3px  hsl(0deg 0% 0% / 0.38), 3px 3px 8px 3px  ${variables.roomcolor.slice(0, -2)}0.5)`;              
-              return output2;
-              if (!variables.temperature_entity) { return output; }
-               let tVal = states[variables.temperature_entity]?.state;                                
-              let tValScaled = convertRange(tVal,[15,30],[120,0]);
-              //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
-
-              return output2;  
-            ]]]
-        - background: |
-            [[[
-              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
-
-              let tempEntity = states[variables.temperature_entity];                                          
-              let tVal = tempEntity.state;                                
-              
-              if (tVal == 'unavailable') { tVal = 0; }
-
-              let humidEntity = states[variables.humidity_entity];              
-              let hVal = humidEntity.state;           
-              if (hVal == 'unavailable') { hVal = 0; }
-              let tValScaled = convertRange(tVal,[15,30],[100,0]);
-              let tempHsla = `hsla(${tValScaled},50%,50%,0.5)`;                                      
-              let hValScaled = convertRange(hVal,[50,100],[130,235])              
-              let fuktHsla = `hsla(${hValScaled},10%,50%,0.5)`;
-
-              let roomHsla = tempHsla;
-              if (variables.roomcolor) {
-                roomHsla = variables.roomcolor;
-              }
-
-              let output3 = `                      
-              radial-gradient(at top left, ${roomHsla} 0%, transparent 50%),
-              radial-gradient(at top right, ${roomHsla} 0%, transparent 50%),
-              radial-gradient(at bottom right, ${roomHsla} 0%, transparent 50%),                                                    
-              radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%),
-              linear-gradient(0deg, transparent 0%, ${roomHsla} 50%, transparent 100%)
-              `;
-
-              return output3;
-            ]]]        
+        - box-shadow: "[[[\n  function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}\
+            \                                                                    \n\
+            \  let output = \"4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.78);\"        \
+            \      \n  let output2 = `4px 4px 2px 3px  hsl(0deg 0% 0% / 0.38), 3px\
+            \ 3px 8px 3px  ${variables.roomcolor.slice(0, -2)}0.5)`;             \
+            \ \n  return output2;\n  if (!variables.temperature_entity) { return output;\
+            \ }\n   let tVal = states[variables.temperature_entity]?.state;      \
+            \                          \n  let tValScaled = convertRange(tVal,[15,30],[120,0]);\n\
+            \  //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;  \
+            \                                        \n\n  return output2;  \n]]]\n"
+        - background: "[[[\n  function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}\n\
+            \n  let tempEntity = states[variables.temperature_entity];           \
+            \                               \n  let tVal = tempEntity.state;     \
+            \                           \n\n  if (tVal == 'unavailable') { tVal =\
+            \ 0; }\n\n  let humidEntity = states[variables.humidity_entity];     \
+            \         \n  let hVal = humidEntity.state;           \n  if (hVal ==\
+            \ 'unavailable') { hVal = 0; }\n  let tValScaled = convertRange(tVal,[15,30],[100,0]);\n\
+            \  let tempHsla = `hsla(${tValScaled},50%,50%,0.5)`;                 \
+            \                     \n  let hValScaled = convertRange(hVal,[50,100],[130,235])\
+            \              \n  let fuktHsla = `hsla(${hValScaled},10%,50%,0.5)`;\n\
+            \n  let roomHsla = tempHsla;\n  if (variables.roomcolor) {\n    roomHsla\
+            \ = variables.roomcolor;\n  }\n\n  let output3 = `                   \
+            \   \n  radial-gradient(at top left, ${roomHsla} 0%, transparent 50%),\n\
+            \  radial-gradient(at top right, ${roomHsla} 0%, transparent 50%),\n \
+            \ radial-gradient(at bottom right, ${roomHsla} 0%, transparent 50%), \
+            \                                                   \n  radial-gradient(at\
+            \ bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent\
+            \ 60%),\n  linear-gradient(0deg, transparent 0%, ${roomHsla} 50%, transparent\
+            \ 100%)\n  `;\n\n  return output3;\n]]]        \n"
+      icon:
+        - width: 40px
+        - color: "[[[\n  if (variables.motion_entity && states[variables.motion_entity]?.state\
+            \ == 'on') {                \n    return \"rgba(255,149,1,0.9)\";    \
+            \                                \n  }\n  return \"rgba(255,255,255,0.9)\"\
+            ;\n]]]\n"
+        - opacity: '0.6'
+      img_cell:
+        - justify-content: start
+        - position: absolute
+        - width: 50px;
+        - height: 50px;
+        - left: 0
+        - bottom: 0
+        - margin: 0 0 15px 15px
+        - border-radius: 500px
       name:
         - font-family: Roboto, sans-serif
         - letter-spacing: .1rem
@@ -697,208 +484,208 @@ button_card_templates:
             ]]]
       state:
         - display: none
-      img_cell:
-        - justify-content: start
-        - position: absolute
-        - width: 50px;
-        - height: 50px;
-        - left: 0
-        - bottom: 0
-        - margin: 0 0 15px 15px
-        - border-radius: 500px
-      icon:
-        - width: 40px
-        - color: |
-            [[[
-              if (variables.motion_entity && states[variables.motion_entity]?.state == 'on') {                
-                return "rgba(255,149,1,0.9)";                                    
-              }
-              return "rgba(255,255,255,0.9)";
-            ]]]
-        - opacity: '0.6'
-      card:
-        - background: none
-        - border-width: 0px
-        - min-height: 50px
+    tap_action:
+      action: navigate
+      navigation_path: |
+        [[[
+          return variables.room_hash;
+        ]]]
+    variables:
+      btn1_hash: null
+      btn1_onoff: null
+      btn2_hash: null
+      btn2_onoff: null
+      card_area: null
+      humidity_entity: null
+      media_entity: null
+      motion_entity: null
+      other: |
+        [[[ return ""; ]]]
+      room_hash: ''
+      temperature_entity: null
   roomcard_nocontrols:
-    template: roomcard2
     styles:
+      card:
+        - min-height: 50px
       grid:
         - grid-template-areas: '"n n n" "infospan infospan infospan" "i blank blank"'
         - grid-template-columns: 1fr 0.5fr 1fr
         - grid-template-rows: 1fr 1fr 1fr
-      card:
-        - min-height: 50px
       name:
         - font-size: 15px
         - font-weight: 800
         - padding-bottom: 0.5em
-decluttering_templates:
-  auto-lights:
-    variables:
-      - area
-    card:
-      type: custom:auto-entities
+    template: roomcard2
+  roomcardnav:
+    icon: |
+      [[[
+        return variables.icon;
+      ]]]
+    size: 100%
+    styles:
       card:
-        type: grid
-        columns: 2
-        square: false
-      card_param: cards
-      filter:
-        include:
-          - domain: light
-            options:
-              type: custom:mushroom-light-card
-              show_brightness_control: true
-              layout: horizontal
-        exclude:
-          - state: unavailable
-          - domain: light
-            not:
-              area: '[[area]]'
-              label: Fysisk
-  spisestue-media:
-    card:
-      type: vertical-stack
-      cards:
-        - type: custom:button-card
-          template: mediacard
+        - border-radius: 20px
+        - filter: drop-shadow(0 0 1.0rem rgb(243,156,15))
+        - font-size: 10px
+        - background: |
+            [[[ if (states[variables.onoff]?.state == 'on' || variables.onoff == 'on') { return 'rgba(200,200,22,0.5)'; }
+              else { return 'rgba(20,20,20,0.2)'; }
+            ]]]
+      icon:
+        - transform: scale(0.4)
+        - font-size: 2px !important;
+        - color: "[[[ if (states[variables.onoff]?.state == 'on') { return 'rgba(30,30,30,0.95)';\
+            \ }\n  else { return 'rgba(20,20,20,0.5)'; }\n]]]                    \
+            \ \n"
+    tap_action:
+      action: navigate
+      navigation_path: |
+        [[[
+          return variables.navhash;
+        ]]]
+    variables:
+      icon: ''
+      navhash: ''
+      onoff: ''
+  settingscard:
+    custom_fields:
+      enheter:
+        card:
+          icon: mdi:devices
+          name: Enheter
+          show_state: false
+          tap_action:
+            action: navigate
+            navigation_path: '#enheter'
+          template: inlinecard
+          type: custom:button-card
+      lys:
+        card:
+          entity: light.alle_lys
+          icon: mdi:lightbulb
+          name: "[[[              \n  var entityIds = states['light.alle_lys']?.attributes?.entity_id;\
+            \              \n  var lightsOn = 0;\n  for (var i = 0; i < entityIds.length;\
+            \ i++) {\n    var lightState = states[entityIds[i]]?.state;\n    if (lightState\
+            \ == 'on') { lightsOn++; }                                          \n\
+            \  }\n  return `Lys (${lightsOn})`;\n]]]\n"
+          show_state: false
+          tap_action:
+            action: navigate
+            navigation_path: '#all-lights'
+          template: inlinecard
+          type: custom:button-card
+      rute:
+        card:
+          entity: switch.schedule_0c6502
+          icon: mdi:timetable
+          name: Rute
+          show_state: false
+          tap_action:
+            action: navigate
+            navigation_path: '#rute'
+          template: inlinecard
+          type: custom:button-card
+    styles:
+      card:
+        - background: rgba(73, 185, 230,0.1);
+        - border: 0
+        - padding: 0
+      grid:
+        - grid-template-areas: '"rute lys enheter"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+        - gap: 2px 2px
+      rute:
+        - grid-area: 1 / 3 / 2 / 4;
+  solarcard:
+    custom_fields:
+      battery:
+        card:
+          entity: sensor.lux_battery
+          name: Battery
+          show_state: true
+          template: barscard
+          type: custom:button-card
           variables:
-            entity_id: media_player.spisestue_nest_hub
-  spisestue-lys:
-    card:
-      type: vertical-stack
-      cards:
-        - type: custom:mushroom-light-card
-          entity: light.spisestue_lampe_light
-          show_brightness_control: true
-          layout: horizontal
-          show_color_control: false
-          name: Lampe
-          icon: mdi:lamp
-        - type: custom:mushroom-light-card
-          entity: light.spisestue_sterjnelys
-          show_brightness_control: true
-          layout: horizontal
-          show_color_control: true
-          name: Sterjnelys
-          icon: mdi:star-circle
-  stue-media:
-    card:
-      type: vertical-stack
-      cards:
-        - type: media-control
-          entity: media_player.living_room_tv_2
-        - type: custom:button-card
-          template: mediacard
+            startcolour: rgba(0,104,0,1)
+      consumption:
+        card:
+          entity: sensor.lux_home_consumption_live
+          icon: mdi:home-import-outline
+          name: Consumption
+          show_state: true
+          template: barscard
+          type: custom:button-card
           variables:
-            entity_id: media_player.piano_nest_hub
-  stue-lys:
-    card:
-      type: vertical-stack
-      cards:
-        - type: horizontal-stack
-          cards:
-            - type: custom:mushroom-light-card
-              entity: light.stue_stikkontakt
-              show_brightness_control: true
-              layout: horizontal
-              show_color_control: false
-              name: Stue Lampe
-              icon: mdi:lamp
-            - type: custom:mushroom-light-card
-              entity: light.juletree_lys_switch
-              show_brightness_control: true
-              layout: horizontal
-              show_color_control: false
-              icon: mdi:bookshelf
-        - type: custom:mushroom-light-card
-          entity: light.lekelys_light
-          show_brightness_control: true
-          layout: horizontal
-          fill_container: true
-          use_light_color: true
-          show_color_control: true
-          icon: mdi:bookshelf
-        - type: custom:mushroom-light-card
-          entity: light.stue_godstol_lys
-          show_brightness_control: true
-          layout: horizontal
-          fill_container: true
-          use_light_color: true
-          show_color_control: true
-          icon: mdi:bookshelf
-  al-media:
-    card:
-      type: custom:button-card
-      template: mediacard
-      variables:
-        entity_id: media_player.beberom_hoyttaler
+            endcolour: rgba(255,255,255,0)
+            max: 5000
+            startcolour: rgba(150,100,0,0.7)
+      solar:
+        card:
+          entity: sensor.lux_solar_output_live
+          icon: mdi:sun-wireless
+          name: Solar
+          show_state: true
+          template: barscard
+          type: custom:button-card
+          variables:
+            endcolour: rgba(255,255,255,0)
+            max: 5000
+            startcolour: rgba(156,174,0,0.7)
+      statustext:
+        card:
+          entity: sensor.lux_grid_flow_live
+          name: Grid flow
+          show_state: true
+          template: barscard
+          type: custom:button-card
+          variables:
+            endcolour: rgba(100,0,0,0.0)
+            max: 4000
+            min: -4000
+            startcolour: rgba(50,200,50,0.7)
+    show_state: true
+    styles:
+      battery:
+        - grid-area: 1 / 3 / 2 / 4;
+      card:
+        - background: rgba(156,104,0,0.1);
+        - border: 0
+        - padding: 0
+      consumption:
+        - grid-area: 1 / 3 / 2 / 4;
+      grid:
+        - grid-template-areas: '"solar"  "consumption" "battery" "statustext"'
+        - grid-template-columns: 1fr
+        - grid-template-rows: 1fr 1fr 1fr 1fr
+        - gap: 2px 2px
+      solar:
+        - grid-area: 1 / 2 / 2 / 3
+decluttering_templates:
   al-kamera:
     card:
-      type: custom:webrtc-camera
-      url: rtsp://homeass:homeass@192.168.1.166:554/stream1
-      ui: false
-      muted: false
       digital_ptz:
+        mouse_double_click_zoom: true
         mouse_drag_pan: true
         mouse_wheel_zoom: true
-        mouse_double_click_zoom: true
+        persist: true
         touch_drag_pan: true
         touch_pinch_zoom: true
         touch_tap_drag_zoom: true
-        persist: true
-  soverom-lys:
+      muted: false
+      type: custom:webrtc-camera
+      ui: false
+      url: rtsp://homeass:homeass@192.168.1.166:554/stream1
+  al-media:
     card:
-      type: vertical-stack
-      cards:
-        - type: custom:mushroom-light-card
-          entity: light.senglys_light
-          show_brightness_control: true
-          layout: horizontal
-          show_color_control: false
-        - type: grid
-          columns: 2
-          square: false
-          cards:
-            - type: custom:mushroom-light-card
-              name: Venstre
-              entity: light.soveromlys_venstre
-              show_brightness_control: true
-              layout: horizontal
-              show_color_control: false
-            - type: custom:mushroom-light-card
-              entity: light.soveromlys_hoyre
-              name: Høyre
-              show_brightness_control: true
-              layout: horizontal
-              show_color_control: false
-        - type: custom:mushroom-light-card
-          entity: light.soverom_speil_2_light
-          show_brightness_control: true
-          layout: horizontal
-          show_color_control: false
-          name: Speil
-        - type: custom:mushroom-light-card
-          entity: light.soverom_lys_tak_1_light
-          show_brightness_control: true
-          layout: horizontal
-          show_color_control: false
-          name: Tak
-  soverom-media:
-    card:
-      type: vertical-stack
-      cards:
-        - type: custom:button-card
-          template: mediacard
-          variables:
-            entity_id: media_player.soverom_hoyttaler_2
+      template: mediacard
+      type: custom:button-card
+      variables:
+        entity_id: media_player.beberom_hoyttaler
   all-lights-card:
     card:
-      type: vertical-stack
       cards:
-        - type: custom:auto-entities
-          card:
+        - card:
             type: entities
           filter:
             include:
@@ -908,42 +695,61 @@ decluttering_templates:
           sort:
             method: name
             reverse: false
-  morten-card:
-    card:
+          type: custom:auto-entities
       type: vertical-stack
-      cards:
-        - type: entities
-          entities:
-            - entity: person.morten
-            - entity: sensor.steam_76561197960958444
-            - entity: sensor.pixel_8_pro_battery_level
-            - entity: sensor.pixel_8_pro_daily_steps
-            - entity: sensor.steps
-            - entity: sensor.sleep_start_time
-            - entity: sensor.sleep_time_in_bed
-            - entity: sensor.sleep_minutes_asleep
-            - entity: sensor.sleep_minutes_awake
-            - entity: sensor.sleep_efficiency
-  napol-card:
+  auto-lights:
     card:
-      type: vertical-stack
+      card:
+        columns: 2
+        square: false
+        type: grid
+      card_param: cards
+      filter:
+        exclude:
+          - state: unavailable
+          - domain: light
+            not:
+              area: '[[area]]'
+              label: Fysisk
+        include:
+          - domain: light
+            options:
+              layout: horizontal
+              show_brightness_control: true
+              type: custom:mushroom-light-card
+      type: custom:auto-entities
+    variables:
+      - area
+  kjokken-enheter:
+    card:
       cards:
-        - type: entities
-          entities:
-            - entity: person.naomi
-            - entity: sensor.pixel_7a_battery_level_2
-            - entity: sensor.pixel_7a_daily_steps
+        - entities:
+            - entity: sensor.kjoleskap_temperatur
+          type: history-graph
+        - cards:
+            - entities:
+                - entity: sensor.sm_n960f_battery_level
+                - entity: switch.juletree_switch
+                - entity: sensor.kjoleskap_temperatur
+              type: entities
+          columns: 1
+          square: false
+          type: grid
+      type: vertical-stack
+    default:
+      - icon: fire
+  kjokken-media:
+    card:
+      cards:
+        - template: mediacard
+          type: custom:button-card
+          variables:
+            entity_id: media_player.kjokken_hoyttaler_2
+      type: vertical-stack
   kontor-enheter:
     card:
-      type: vertical-stack
       cards:
-        - type: conditional
-          conditions:
-            - condition: user
-              users:
-                - 03908e65b4514ba48ac9f9946bb5ca8d
-          card:
-            type: entities
+        - card:
             entities:
               - entity: binary_sensor.kontor_bevegelsessensor_ias_sone
               - entity: switch.spisestue_skjoteledning_b
@@ -954,554 +760,678 @@ decluttering_templates:
               - entity: button.grace_grace_mediaplaypause
               - entity: sensor.database_free_space_days_remaining
               - entity: sensor.database_size_growth_daily_last_period
-        - show_name: true
+            type: entities
+          conditions:
+            - condition: user
+              users:
+                - 03908e65b4514ba48ac9f9946bb5ca8d
+          type: conditional
+        - entity: update.zha_network_card_update
+          icon: mdi:zigbee
           show_icon: true
-          type: button
+          show_name: true
           tap_action:
             action: navigate
             navigation_path: /config/zha/add
-          entity: update.zha_network_card_update
-          icon: mdi:zigbee
-        - type: entities
-          entities:
+          type: button
+        - entities:
             - sensor.grace_gputemperature
             - sensor.grace_storage_d
             - sensor.grace_storage_c
+          type: entities
+      type: vertical-stack
   kontor-lys:
     card:
-      type: vertical-stack
       cards:
-        - type: custom:decluttering-card
-          template: auto-lights
+        - template: auto-lights
+          type: custom:decluttering-card
           variables:
             - area: Kontor
-        - type: custom:mushroom-light-card
-          entity: light.kontor_magic
-          show_brightness_control: true
+        - entity: light.kontor_magic
           layout: horizontal
+          show_brightness_control: true
           show_color_control: false
-        - type: entities
-          entities:
+          type: custom:mushroom-light-card
+        - entities:
             - input_select.kontor_mode
-  kjokken-media:
-    card:
+          type: entities
       type: vertical-stack
-      cards:
-        - type: custom:button-card
-          template: mediacard
-          variables:
-            entity_id: media_player.kjokken_hoyttaler_2
-  kjokken-enheter:
-    default:
-      - icon: fire
+  morten-card:
     card:
-      type: vertical-stack
       cards:
-        - type: history-graph
-          entities:
-            - entity: sensor.kjoleskap_temperatur
-        - type: grid
-          columns: 1
+        - entities:
+            - entity: person.morten
+            - entity: sensor.steam_76561197960958444
+            - entity: sensor.pixel_8_pro_battery_level
+            - entity: sensor.pixel_8_pro_daily_steps
+            - entity: sensor.steps
+            - entity: sensor.sleep_start_time
+            - entity: sensor.sleep_time_in_bed
+            - entity: sensor.sleep_minutes_asleep
+            - entity: sensor.sleep_minutes_awake
+            - entity: sensor.sleep_efficiency
+          type: entities
+      type: vertical-stack
+  napol-card:
+    card:
+      cards:
+        - entities:
+            - entity: person.naomi
+            - entity: sensor.pixel_7a_battery_level_2
+            - entity: sensor.pixel_7a_daily_steps
+          type: entities
+      type: vertical-stack
+  soverom-lys:
+    card:
+      cards:
+        - entity: light.senglys_light
+          layout: horizontal
+          show_brightness_control: true
+          show_color_control: false
+          type: custom:mushroom-light-card
+        - cards:
+            - entity: light.soveromlys_venstre
+              layout: horizontal
+              name: Venstre
+              show_brightness_control: true
+              show_color_control: false
+              type: custom:mushroom-light-card
+            - entity: light.soveromlys_hoyre
+              layout: horizontal
+              name: Høyre
+              show_brightness_control: true
+              show_color_control: false
+              type: custom:mushroom-light-card
+          columns: 2
           square: false
-          cards:
-            - type: entities
-              entities:
-                - entity: sensor.sm_n960f_battery_level
-                - entity: switch.juletree_switch
-                - entity: sensor.kjoleskap_temperatur
+          type: grid
+        - entity: light.soverom_speil_2_light
+          layout: horizontal
+          name: Speil
+          show_brightness_control: true
+          show_color_control: false
+          type: custom:mushroom-light-card
+        - entity: light.soverom_lys_tak_1_light
+          layout: horizontal
+          name: Tak
+          show_brightness_control: true
+          show_color_control: false
+          type: custom:mushroom-light-card
+      type: vertical-stack
+  soverom-media:
+    card:
+      cards:
+        - template: mediacard
+          type: custom:button-card
+          variables:
+            entity_id: media_player.soverom_hoyttaler_2
+      type: vertical-stack
+  spisestue-lys:
+    card:
+      cards:
+        - entity: light.spisestue_lampe_light
+          icon: mdi:lamp
+          layout: horizontal
+          name: Lampe
+          show_brightness_control: true
+          show_color_control: false
+          type: custom:mushroom-light-card
+        - entity: light.spisestue_sterjnelys
+          icon: mdi:star-circle
+          layout: horizontal
+          name: Sterjnelys
+          show_brightness_control: true
+          show_color_control: true
+          type: custom:mushroom-light-card
+      type: vertical-stack
+  spisestue-media:
+    card:
+      cards:
+        - template: mediacard
+          type: custom:button-card
+          variables:
+            entity_id: media_player.spisestue_nest_hub
+      type: vertical-stack
+  stue-lys:
+    card:
+      cards:
+        - cards:
+            - entity: light.stue_stikkontakt
+              icon: mdi:lamp
+              layout: horizontal
+              name: Stue Lampe
+              show_brightness_control: true
+              show_color_control: false
+              type: custom:mushroom-light-card
+            - entity: light.juletree_lys_switch
+              icon: mdi:bookshelf
+              layout: horizontal
+              show_brightness_control: true
+              show_color_control: false
+              type: custom:mushroom-light-card
+          type: horizontal-stack
+        - entity: light.lekelys_light
+          fill_container: true
+          icon: mdi:bookshelf
+          layout: horizontal
+          show_brightness_control: true
+          show_color_control: true
+          type: custom:mushroom-light-card
+          use_light_color: true
+        - entity: light.stue_godstol_lys
+          fill_container: true
+          icon: mdi:bookshelf
+          layout: horizontal
+          show_brightness_control: true
+          show_color_control: true
+          type: custom:mushroom-light-card
+          use_light_color: true
+      type: vertical-stack
+  stue-media:
+    card:
+      cards:
+        - entity: media_player.living_room_tv_2
+          type: media-control
+        - template: mediacard
+          type: custom:button-card
+          variables:
+            entity_id: media_player.piano_nest_hub
+      type: vertical-stack
 views:
-  - path: roomcardnew
-    background: >-
-      radial-gradient(rgba(57,24,1,0.67) 0%, rgba(206,133,251,0) 100%),
-      linear-gradient(45deg, transparent 0%, rgba(38,87,0,0.61) 100%,
-      rgba(127,176,6,0.51) 100%), linear-gradient(rgba(0,2,140,0.69) 0%,
-      rgba(47,78,94,0.62) 100%), linear-gradient(154deg, rgba(9,133,204,1) 0%,
-      rgba(59,78,240,1) 100%)
+  - background: radial-gradient(rgba(57,24,1,0.67) 0%, rgba(206,133,251,0) 100%),
+      linear-gradient(45deg, transparent 0%, rgba(38,87,0,0.61) 100%, rgba(127,176,6,0.51)
+      100%), linear-gradient(rgba(0,2,140,0.69) 0%, rgba(47,78,94,0.62) 100%), linear-gradient(154deg,
+      rgba(9,133,204,1) 0%, rgba(59,78,240,1) 100%)
     cards:
-      - type: custom:button-card
-        template: infocard
-      - type: custom:button-card
-        template: settingscard
-      - type: horizontal-stack
-        cards:
-          - type: custom:button-card
+      - template: infocard
+        type: custom:button-card
+      - template: settingscard
+        type: custom:button-card
+      - cards:
+          - icon: mdi:chair-rolling
+            name: Kontor
             template: roomcard2
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.zone_temperatur
-              humidity_entity: sensor.zone_fuktighet
-              motion_entity: binary_sensor.kontor_bevegelsessensor_occupancy
-              name: Kontor
-              roomcolor: hsla(17, 50%, 50%, 1)
               btn1_hash: '#kontor-lys'
               btn1_icon: mdi:lamp
               btn1_onoff: light.kontor_magic
               btn2_hash: '#kontor-enheter'
               btn2_icon: mdi:devices
               btn2_onoff: switch.spisestue_skjoteledning_b
+              humidity_entity: sensor.zone_fuktighet
+              motion_entity: binary_sensor.kontor_bevegelsessensor_occupancy
+              name: Kontor
               room_hash: '#kontor-room'
-            name: Kontor
-            icon: mdi:chair-rolling
-          - type: custom:button-card
+              roomcolor: hsla(17, 50%, 50%, 1)
+              temperature_entity: sensor.zone_temperatur
+          - icon: mdi:microwave
+            name: Kjøkken
             template: roomcard2
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.kjoekken_temperatur
-              humidity_entity: sensor.kjoekken_fuktighet
-              motion_entity: binary_sensor.kjoekken_bevegelsessensor_occupancy
-              media_entity: media_player.kjokken_hoyttaler
-              name: Kjøkken
-              roomcolor: hsla(138, 10%, 50%, 1)
               btn1_hash: '#kjokken-media'
               btn1_icon: mdi:speaker
               btn1_onoff: media_player.kjokken_hoyttaler
               btn2_hash: '#kjokken-enheter'
               btn2_icon: mdi:devices
+              humidity_entity: sensor.kjoekken_fuktighet
+              media_entity: media_player.kjokken_hoyttaler
+              motion_entity: binary_sensor.kjoekken_bevegelsessensor_occupancy
+              name: Kjøkken
               room_hash: '#kjokken-room'
-            name: Kjøkken
-            icon: mdi:microwave
-      - type: horizontal-stack
-        cards:
-          - type: custom:button-card
-            template: roomcard2
-            group_expand: true
-            name: Soverom
+              roomcolor: hsla(138, 10%, 50%, 1)
+              temperature_entity: sensor.kjoekken_temperatur
+        type: horizontal-stack
+      - cards:
+          - group_expand: true
             icon: mdi:bed
+            name: Soverom
+            template: roomcard2
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.soverom_temperatur
-              humidity_entity: sensor.soverom_fuktighet
-              name: Soverom
-              roomcolor: hsla(238, 50%, 50%, 1)
               btn1_hash: '#soverom-lys'
               btn1_icon: mdi:lamp
               btn1_onoff: light.soverom_lys
               btn2_hash: '#soverom-media'
               btn2_icon: mdi:speaker
+              humidity_entity: sensor.soverom_fuktighet
+              name: Soverom
               room_hash: '#soverom-room'
-          - type: custom:button-card
+              roomcolor: hsla(238, 50%, 50%, 1)
+              temperature_entity: sensor.soverom_temperatur
+          - entity: sensor.kontor_temperatur
+            icon: mdi:elephant
+            name: Anna-Lisbeth
             template: roomcard2
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.kontor_temperatur
-              humidity_entity: sensor.kontor_fuktighet
-              roomcolor: hsla(299, 50%, 50%, 1)
               btn1_hash: '#al-kamera'
-              btn1_onoff: 'on'
               btn1_icon: mdi:video
+              btn1_onoff: 'on'
               btn2_hash: '#al-media'
               btn2_icon: mdi:speaker
+              humidity_entity: sensor.kontor_fuktighet
               room_hash: '#al-room'
-            name: Anna-Lisbeth
-            icon: mdi:elephant
-            entity: sensor.kontor_temperatur
+              roomcolor: hsla(299, 50%, 50%, 1)
+              temperature_entity: sensor.kontor_temperatur
         columns: 2
-      - type: grid
-        square: false
+        type: horizontal-stack
+      - cards:
+          - template: aqicard
+            type: custom:button-card
         columns: 1
-        cards:
-          - type: custom:button-card
-            template: aqicard
-      - type: horizontal-stack
-        cards:
-          - type: custom:button-card
+        square: false
+        type: grid
+      - cards:
+          - icon: mdi:sofa
+            name: Stue
             template: roomcard2
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.awair_lr_temp
-              humidity_entity: sensor.awair_lr_humid
-              name: Stue
-              roomcolor: hsla(104, 100%, 27%, 1)
-              room_hash: '#stue-room'
               btn1_hash: '#stue-lys'
               btn1_icon: mdi:lamp
               btn1_onoff: light.stue_lys
               btn2_hash: '#stue-media'
               btn2_icon: mdi:speaker
-            name: Stue
-            icon: mdi:sofa
-          - type: custom:button-card
+              humidity_entity: sensor.awair_lr_humid
+              name: Stue
+              room_hash: '#stue-room'
+              roomcolor: hsla(104, 100%, 27%, 1)
+              temperature_entity: sensor.awair_lr_temp
+          - icon: mdi:star
+            name: Spisestue
+            show_state: true
+            tap_action:
+              action: navigate
+              navigation_path: '#spisestue-room'
             template: roomcard2
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.gjallarhorn_temperature
-              humidity_entity: sensor.gjallarhorn_humidity
-              motion_entity: binary_sensor.spisestue_any
-              roomcolor: hsla(260, 100%, 57%, 1)
-              room_hash: '#spisestue-room'
               btn1_hash: '#spisestue-lys'
               btn1_icon: mdi:lamp
               btn1_onoff: light.spisestue_lys
               btn2_hash: '#spisestue-media'
               btn2_icon: mdi:speaker
-            name: Spisestue
-            icon: mdi:star
-            tap_action:
-              action: navigate
-              navigation_path: '#spisestue-room'
-            show_state: true
+              humidity_entity: sensor.gjallarhorn_humidity
+              motion_entity: binary_sensor.spisestue_any
+              room_hash: '#spisestue-room'
+              roomcolor: hsla(260, 100%, 57%, 1)
+              temperature_entity: sensor.gjallarhorn_temperature
         columns: 2
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
-            card_type: pop-up
-            hash: '#kjokken-room'
-            name: Kjøkken
-            icon: mdi:table-chair
-            button_type: state
-            show_state: true
-            show_last_changed: false
-            show_attribute: false
+        type: horizontal-stack
+      - cards:
+          - button_type: state
             card_layout: large
+            card_type: pop-up
             entity: sensor.kjoekken_temperatur
-          - type: custom:decluttering-card
-            template: kjokken-media
-          - type: custom:decluttering-card
-            template: kjokken-enheter
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
-            card_type: pop-up
-            hash: '#kjokken-media'
-            name: Kjokken Media
-            icon: mdi:speaker
-            button_type: state
-            show_state: false
-            show_last_changed: true
+            hash: '#kjokken-room'
+            icon: mdi:table-chair
+            name: Kjøkken
             show_attribute: false
+            show_last_changed: false
+            show_state: true
+            type: custom:bubble-card
+          - template: kjokken-media
+            type: custom:decluttering-card
+          - template: kjokken-enheter
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_layout: large
+            card_type: pop-up
             entity: media_player.kjokken_hoyttaler
-          - type: custom:decluttering-card
-            template: kjokken-media
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            hash: '#kjokken-media'
+            icon: mdi:speaker
+            name: Kjokken Media
+            show_attribute: false
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: kjokken-media
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
+            card_layout: large
             card_type: pop-up
             hash: '#kjokken-enheter'
-            name: Kjøkken Enheter
             icon: mdi:table-chair
-            button_type: state
-            show_state: false
-            show_last_changed: true
+            name: Kjøkken Enheter
             show_attribute: false
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: kjokken-enheter
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: slider
             card_layout: large
-          - type: custom:decluttering-card
-            template: kjokken-enheter
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
             card_type: pop-up
-            hash: '#kontor-lys'
-            name: Kontor
-            icon: mdi:chair-rolling
             entity: light.kontor_magic
-            button_type: slider
-            show_state: false
-            show_last_changed: true
+            hash: '#kontor-lys'
+            icon: mdi:chair-rolling
+            name: Kontor
             show_attribute: false
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: kontor-lys
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_layout: large
-          - type: custom:decluttering-card
-            template: kontor-lys
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
             card_type: pop-up
             hash: '#kontor-enheter'
-            name: Kontor Enheter
             icon: mdi:chair-rolling
-            button_type: state
-            show_state: false
-            show_last_changed: true
+            name: Kontor Enheter
             show_attribute: false
-            card_layout: large
-          - type: custom:decluttering-card
-            template: kontor-enheter
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: kontor-enheter
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_type: pop-up
-            hash: '#morten-card'
-            name: Morten
             entity: person.morten
+            hash: '#morten-card'
             icon: mdi:dog
-            button_type: state
+            name: Morten
             show_state: false
-          - type: custom:decluttering-card
-            template: morten-card
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            type: custom:bubble-card
+          - template: morten-card
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_type: pop-up
-            hash: '#all-lights'
-            name: Lys
             entity: light.alle_lys
+            hash: '#all-lights'
             icon: mdi:light-flood-up
-            button_type: state
+            name: Lys
             show_state: false
-          - type: custom:decluttering-card
-            template: all-lights-card
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            type: custom:bubble-card
+          - template: all-lights-card
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_type: pop-up
-            hash: '#napol-card'
-            name: Naomi
             entity: person.naomi
+            hash: '#napol-card'
             icon: mdi:horse
-            button_type: state
+            name: Naomi
             show_state: false
-          - type: custom:decluttering-card
-            template: napol-card
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            type: custom:bubble-card
+          - template: napol-card
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
+            card_layout: large
             card_type: pop-up
             hash: '#kontor-room'
-            name: Kontor
             icon: mdi:chair-rolling
-            button_type: state
-            show_state: false
-            show_last_changed: true
+            name: Kontor
             show_attribute: false
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: kontor-lys
+            type: custom:decluttering-card
+          - template: kontor-enheter
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_layout: large
-          - type: custom:decluttering-card
-            template: kontor-lys
-          - type: custom:decluttering-card
-            template: kontor-enheter
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
             card_type: pop-up
             hash: '#soverom-media'
-            name: Soverom Media
             icon: mdi:speaker
-            button_type: state
-            show_state: false
-            show_last_changed: true
+            name: Soverom Media
             show_attribute: false
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: soverom-media
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: slider
             card_layout: large
-          - type: custom:decluttering-card
-            template: soverom-media
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
             card_type: pop-up
+            entity: light.soverom_lys
             hash: '#soverom-lys'
+            icon: mdi:bed
             name: Soverom Lys
-            icon: mdi:bed
-            entity: light.soverom_lys
-            button_type: slider
-            show_state: false
-            show_last_changed: true
             show_attribute: false
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: soverom-lys
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: slider
             card_layout: large
-          - type: custom:decluttering-card
-            template: soverom-lys
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
             card_type: pop-up
-            hash: '#soverom-room'
-            name: Soverom
-            icon: mdi:bed
             entity: light.soverom_lys
-            button_type: slider
-            show_state: false
-            show_last_changed: true
+            hash: '#soverom-room'
+            icon: mdi:bed
+            name: Soverom
             show_attribute: false
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: soverom-media
+            type: custom:decluttering-card
+          - template: soverom-lys
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_layout: large
-          - type: custom:decluttering-card
-            template: soverom-media
-          - type: custom:decluttering-card
-            template: soverom-lys
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
             card_type: pop-up
             hash: '#al-kamera'
-            name: AL Kamera
             icon: mdi:chair-rolling
-            button_type: state
-            show_state: false
+            name: AL Kamera
+            show_attribute: false
             show_header: false
             show_last_changed: true
-            show_attribute: false
-            card_layout: large
-          - type: custom:decluttering-card
-            template: al-kamera
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
-            card_type: pop-up
-            hash: '#al-media'
-            name: AL Media
-            icon: mdi:speaker
-            button_type: state
             show_state: false
-            show_last_changed: true
-            show_attribute: false
+            type: custom:bubble-card
+          - template: al-kamera
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_layout: large
+            card_type: pop-up
             entity: media_player.beberom_hoyttaler
-          - type: custom:decluttering-card
-            template: al-media
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            hash: '#al-media'
+            icon: mdi:speaker
+            name: AL Media
+            show_attribute: false
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - template: al-media
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: name
+            card_layout: large
             card_type: pop-up
             hash: '#al-room'
-            name: Anna-Lisbeth
             icon: mdi:elephant
-            button_type: name
-            show_state: false
-            show_last_changed: true
+            name: Anna-Lisbeth
             show_attribute: false
-            card_layout: large
-          - type: vertical-stack
-            cards:
-              - type: custom:decluttering-card
-                template: al-media
-              - type: custom:decluttering-card
-                template: al-kamera
-              - square: false
-                type: grid
-                cards:
-                  - type: custom:mushroom-light-card
-                    entity: light.beberom_lys_light
-                    name: Seng
-                    show_color_temp_control: false
-                    use_light_color: true
-                    show_brightness_control: true
+            show_last_changed: true
+            show_state: false
+            type: custom:bubble-card
+          - cards:
+              - template: al-media
+                type: custom:decluttering-card
+              - template: al-kamera
+                type: custom:decluttering-card
+              - cards:
+                  - entity: light.beberom_lys_light
                     layout: horizontal
-                  - type: custom:mushroom-light-card
-                    entity: light.brodboks_stikkontakt_switch
+                    name: Seng
+                    show_brightness_control: true
+                    show_color_temp_control: false
+                    type: custom:mushroom-light-card
+                    use_light_color: true
+                  - entity: light.brodboks_stikkontakt_switch
                     name: Lese lys
+                    type: custom:mushroom-light-card
                 columns: 2
-              - type: custom:comfortable-environment-card
+                square: false
+                type: grid
+              - humidity_sensor: sensor.kontor_fuktighet
                 room_name: Anna-Lisbeth
                 temperature_sensor: sensor.kontor_temperatur
-                humidity_sensor: sensor.kontor_fuktighet
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+                type: custom:comfortable-environment-card
+            type: vertical-stack
+        type: vertical-stack
+      - cards:
+          - button_type: name
+            card_layout: large
             card_type: pop-up
-            hash: '#stue-media'
-            name: Stue Media
-            icon: mdi:sofa
             entity: media_player.living_room_tv_2
-            button_type: name
-            show_state: true
-            show_last_changed: true
-            show_attribute: false
-            card_layout: large
-          - type: custom:decluttering-card
-            template: stue-media
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
-            card_type: pop-up
-            hash: '#stue-lys'
-            name: Stue Lys
+            hash: '#stue-media'
             icon: mdi:sofa
+            name: Stue Media
+            show_attribute: false
+            show_last_changed: true
+            show_state: true
+            type: custom:bubble-card
+          - template: stue-media
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: name
+            card_layout: large
+            card_type: pop-up
             entity: light.stue_lys
-            button_type: name
-            show_state: true
-            show_last_changed: true
-            show_attribute: false
-            card_layout: large
-          - type: custom:decluttering-card
-            template: stue-lys
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
-            card_type: pop-up
-            hash: '#stue-room'
-            name: Stue
+            hash: '#stue-lys'
             icon: mdi:sofa
-            entity: sensor.awair_lr_temp
-            button_type: state
-            show_state: true
-            show_last_changed: false
+            name: Stue Lys
             show_attribute: false
+            show_last_changed: true
+            show_state: true
+            type: custom:bubble-card
+          - template: stue-lys
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
             card_layout: large
-          - type: custom:decluttering-card
-            template: stue-lys
-          - type: custom:decluttering-card
-            template: stue-media
-          - type: custom:mushroom-chips-card
+            card_type: pop-up
+            entity: sensor.awair_lr_temp
+            hash: '#stue-room'
+            icon: mdi:sofa
+            name: Stue
+            show_attribute: false
+            show_last_changed: false
+            show_state: true
+            type: custom:bubble-card
+          - template: stue-lys
+            type: custom:decluttering-card
+          - template: stue-media
+            type: custom:decluttering-card
+          - alignment: justify
             chips:
-              - type: entity
-                entity: sensor.awair_lr_score
+              - entity: sensor.awair_lr_score
                 icon_color: primary
-              - type: entity
-                entity: sensor.awair_lr_pm25
+                type: entity
+              - entity: sensor.awair_lr_pm25
                 icon: mdi:molecule
                 icon_color: red
-              - type: entity
-                entity: sensor.awair_lr_voc
+                type: entity
+              - entity: sensor.awair_lr_voc
                 icon: mdi:air-filter
                 icon_color: teal
-              - type: entity
-                entity: sensor.awair_lr_co2
+                type: entity
+              - entity: sensor.awair_lr_co2
                 icon: mdi:molecule-co2
                 icon_color: amber
-            alignment: justify
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+                type: entity
+            type: custom:mushroom-chips-card
+        type: vertical-stack
+      - cards:
+          - button_type: state
+            card_layout: large
             card_type: pop-up
             hash: '#spisestue-lys'
-            name: Spisestue
             icon: mdi:desk
-            button_type: state
-            show_state: true
-            show_last_changed: false
+            name: Spisestue
             show_attribute: false
-            card_layout: large
-          - type: custom:decluttering-card
-            template: spisestue-lys
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            show_last_changed: false
+            show_state: true
+            type: custom:bubble-card
+          - template: spisestue-lys
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - card_layout: large
             card_type: pop-up
             hash: '#spisestue-media'
-            name: Spisestue
             icon: mdi:desk
-            card_layout: large
-          - type: custom:decluttering-card
-            template: spisestue-media
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            name: Spisestue
+            type: custom:bubble-card
+          - template: spisestue-media
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - card_layout: large
             card_type: pop-up
             hash: '#spisestue-room'
-            name: Spisestue
             icon: mdi:desk
-            card_layout: large
-          - type: custom:decluttering-card
-            template: spisestue-lys
-          - type: custom:decluttering-card
-            template: spisestue-media
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            name: Spisestue
+            type: custom:bubble-card
+          - template: spisestue-lys
+            type: custom:decluttering-card
+          - template: spisestue-media
+            type: custom:decluttering-card
+        type: vertical-stack
+      - cards:
+          - card_layout: large
             card_type: pop-up
             hash: '#garasje-room'
-            name: Garasje
             icon: mdi:weight-lifter
-            card_layout: large
-          - type: custom:webrtc-camera
-            url: rtsp://homeass:homeass@192.168.1.46:554/stream2
-            ui: false
-            muted: false
-            digital_ptz:
+            name: Garasje
+            type: custom:bubble-card
+          - digital_ptz:
+              mouse_double_click_zoom: true
               mouse_drag_pan: true
               mouse_wheel_zoom: true
-              mouse_double_click_zoom: true
+              persist: true
               touch_drag_pan: true
               touch_pinch_zoom: true
               touch_tap_drag_zoom: true
-              persist: true
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
-            card_type: pop-up
-            show_header: false
+            muted: false
+            type: custom:webrtc-camera
+            ui: false
+            url: rtsp://homeass:homeass@192.168.1.46:554/stream2
+        type: vertical-stack
+      - cards:
+          - card_type: pop-up
             hash: '#rute'
-          - type: custom:scheduler-card
+            show_header: false
+            type: custom:bubble-card
+          - display_options:
+              icon: action
+              primary_info: default
+              secondary_info:
+                - relative-time
+                - additional-tasks
+            exclude: []
             include:
               - automation
               - binary_sensor
@@ -1525,82 +1455,80 @@ views:
               - sun
               - switch
               - vacuum
-            exclude: []
-            title: ''
             time_step: 30
-            display_options:
-              primary_info: default
-              secondary_info:
-                - relative-time
-                - additional-tasks
-              icon: action
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            title: ''
+            type: custom:scheduler-card
+        type: vertical-stack
+      - cards:
+          - card_layout: large
             card_type: pop-up
             hash: '#verksted-room'
-            name: Verksted
             icon: mdi:hand-saw
-            card_layout: large
-          - type: custom:webrtc-camera
-            url: rtsp://homeass:homeass@192.168.1.47:554/stream1
-            ui: false
-            muted: false
-            digital_ptz:
+            name: Verksted
+            type: custom:bubble-card
+          - digital_ptz:
+              mouse_double_click_zoom: true
               mouse_drag_pan: true
               mouse_wheel_zoom: true
-              mouse_double_click_zoom: true
+              persist: true
               touch_drag_pan: true
               touch_pinch_zoom: true
               touch_tap_drag_zoom: true
-              persist: true
-          - type: entities
-            entities:
+            muted: false
+            type: custom:webrtc-camera
+            ui: false
+            url: rtsp://homeass:homeass@192.168.1.47:554/stream1
+          - entities:
               - light.verksted_lys
               - sensor.verksted_fuktighet
               - sensor.verksted_temperatur
-      - type: vertical-stack
-        cards:
-          - type: custom:bubble-card
+            type: entities
+        type: vertical-stack
+      - cards:
+          - card_layout: large
             card_type: pop-up
             hash: '#enheter'
-            name: Enheter
             icon: mdi:devices
-            card_layout: large
-          - type: entities
-            entities:
+            name: Enheter
+            type: custom:bubble-card
+          - entities:
               - switch.dehumidifier_switch
-          - type: custom:auto-entities
-            view_layout:
-              grid-area: main
-            card:
+            type: entities
+          - card:
               show_header_toggle: false
               title: Offline
               type: entities
             filter:
               include:
                 - domain: sensor
-                  integration: zha
                   entity_id: '*_batteri'
+                  integration: zha
                   state: unavailable
                 - domain: sensor
-                  integration: zha
                   entity_id: '*_batteri'
+                  integration: zha
                   state: unknown
                 - domain: sensor
-                  integration: zha
                   entity_id: '*_power'
+                  integration: zha
                   state: unavailable
                 - domain: sensor
-                  integration: zha
                   entity_id: '*_power'
+                  integration: zha
                   state: unknown
             show_empty: false
-          - type: custom:auto-entities
-            card:
-              type: entities
+            type: custom:auto-entities
+            view_layout:
+              grid-area: main
+          - card:
               state_color: true
+              type: entities
             filter:
+              exclude:
+                - domain: binary_sensor
+                  state: unknown
+                - domain: binary_sensor
+                  state: unavailable
               include:
                 - entity_id: binary_sensor.*ias_*
                   options:
@@ -1611,51 +1539,49 @@ views:
                 - entity_id: binary_sensor.*beveg*
                   options:
                     secondary_info: last-changed
-              exclude:
-                - domain: binary_sensor
-                  state: unknown
-                - domain: binary_sensor
-                  state: unavailable
             sort:
               method: last_changed
               reverse: true
+            type: custom:auto-entities
             unique: true
-      - square: false
-        columns: 3
-        type: grid
-        cards:
-          - type: custom:button-card
+        type: vertical-stack
+      - cards:
+          - icon: mdi:weight-lifter
+            name: Garasje
             template: roomcard_nocontrols
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.garasje_temperatur
               humidity_entity: sensor.garasje_fuktighet
               name: Garasje
-              roomcolor: hsla(231, 51%, 26%, 1)
               room_hash: '#garasje-room'
-            name: Garasje
-            icon: mdi:weight-lifter
-          - type: custom:button-card
+              roomcolor: hsla(231, 51%, 26%, 1)
+              temperature_entity: sensor.garasje_temperatur
+          - icon: mdi:hand-saw
+            name: Verksted
             template: roomcard_nocontrols
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.verksted_temperatur
               humidity_entity: sensor.verksted_fuktighet
               motion_entity: binary_sensor.dorsensor_status
-              roomcolor: hsla(100, 51%, 26%, 1)
               room_hash: '#verksted-room'
-            name: Verksted
-            icon: mdi:hand-saw
-          - type: custom:button-card
+              roomcolor: hsla(100, 51%, 26%, 1)
+              temperature_entity: sensor.verksted_temperatur
+          - icon: mdi:shower-head
+            name: Baderom
             template: roomcard_nocontrols
+            type: custom:button-card
             variables:
-              temperature_entity: sensor.baderom_temperatur
               humidity_entity: sensor.baderom_fuktighet
               roomcolor: hsla(189, 66%, 52%, 1)
-            name: Baderom
-            icon: mdi:shower-head
-      - type: horizontal-stack
-        cards:
-          - type: custom:button-card
-            template: ratescard
-          - type: custom:button-card
-            template: solarcard
+              temperature_entity: sensor.baderom_temperatur
+        columns: 3
+        square: false
+        type: grid
+      - cards:
+          - template: ratescard
+            type: custom:button-card
+          - template: solarcard
+            type: custom:button-card
+        type: horizontal-stack
+    path: roomcardnew
     type: custom:vertical-layout
