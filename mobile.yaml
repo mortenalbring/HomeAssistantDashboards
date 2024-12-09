@@ -511,6 +511,8 @@ button_card_templates:
             [[[ return variables.btn1_onoff; ]]]
           template: roomcardnav
           variables:
+            card_area: |
+              [[[ return variables.card_area ]]]
             onoff: |
               [[[ return variables.btn1_onoff; ]]]
             navhash: |
@@ -568,6 +570,7 @@ button_card_templates:
           return '';
         ]]]
     variables:
+      card_area: null
       temperature_entity: null
       humidity_entity: null
       motion_entity: null
@@ -945,38 +948,25 @@ decluttering_templates:
     card:
       type: vertical-stack
       cards:
-        - type: grid
-          columns: 2
-          square: false
-          cards:
-            - type: custom:mushroom-light-card
-              entity: light.zone_light_1
-              show_brightness_control: true
-              layout: horizontal
-              show_color_control: false
-              name: Light 1
-            - type: custom:mushroom-light-card
-              entity: light.zone_light_2
-              show_brightness_control: true
-              layout: horizontal
-              show_color_control: false
-              name: Light 2
-        - type: grid
-          columns: 2
-          square: false
-          cards:
-            - type: custom:mushroom-light-card
-              entity: light.kontorlys_venstre
-              show_brightness_control: true
-              layout: horizontal
-              show_color_control: false
-              name: Venstre
-            - type: custom:mushroom-light-card
-              entity: light.kontorlys_hoyre
-              show_brightness_control: true
-              layout: horizontal
-              show_color_control: false
-              name: Høyre
+        - type: custom:auto-entities
+          card:
+            type: grid
+            columns: 2
+            square: false
+          card_param: cards
+          filter:
+            include:
+              - domain: light
+                options:
+                  type: custom:mushroom-light-card
+                  show_brightness_control: true
+                  layout: horizontal
+            exclude:
+              - state: unavailable
+              - domain: light
+                not:
+                  area: Kontor
+                  label: Fysisk      
         - type: custom:mushroom-light-card
           entity: light.kontor_magic
           show_brightness_control: true
