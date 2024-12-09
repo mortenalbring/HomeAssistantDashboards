@@ -247,7 +247,6 @@ button_card_templates:
                     [[[ return variables.entity_id; ]]]                      
                   media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1pluss
                 name: P1+
-                
               - type: script
                 id: script.mass_media_play
                 data:
@@ -796,7 +795,7 @@ decluttering_templates:
           show_color_control: true
           icon: mdi:bookshelf
         - type: custom:mushroom-light-card
-          entity: light.godstol_light
+          entity: light.stue_godstol_lys
           show_brightness_control: true
           layout: horizontal
           fill_container: true
