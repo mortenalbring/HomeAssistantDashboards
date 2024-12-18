@@ -67,12 +67,17 @@ button_card_templates:
         - height: 100%;
         - border: 1px solid;
         - background-size: 100% 20px, 100%;
-        - border-color: "[[[ \nreturn variables.startcolour; ]]]\n"
-        - background: "[[[              \n  var perc = parseInt((entity.state / variables.max)\
-            \ * 100);\n  if (isNaN(perc)) { perc = 0; }\n\n  var grad = `linear-gradient(to\
-            \ right, ${variables.startcolour} 0%, ${variables.startcolour}, ${variables.startcolour}\
-            \ ${perc}%, ${variables.endcolour}, ${variables.endcolour} 100%)`;   \
-            \           \n  return grad;\n]]]\n"
+        - border-color: |
+            [[[ 
+            return variables.startcolour; ]]]
+        - background: |
+            [[[              
+              var perc = parseInt((entity.state / variables.max) * 100);
+              if (isNaN(perc)) { perc = 0; }
+
+              var grad = `linear-gradient(to right, ${variables.startcolour} 0%, ${variables.startcolour}, ${variables.startcolour} ${perc}%, ${variables.endcolour}, ${variables.endcolour} 100%)`;              
+              return grad;
+            ]]]
       grid:
         - grid-template-areas: '"i n n" "i s s"'
         - grid-template-columns: 1fr 1fr 1fr
@@ -166,50 +171,50 @@ button_card_templates:
             buttons:
               - data:
                   media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1
-                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
-                    \                   \n"
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
                 id: script.mass_media_play
                 name: P1
                 type: script
               - data:
                   media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p1pluss
-                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
-                    \                   \n"
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
                 id: script.mass_media_play
                 name: P1+
                 type: script
               - data:
                   media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/p2
-                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
-                    \                   \n"
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
                 id: script.mass_media_play
                 name: P2
                 type: script
               - data:
                   media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/klassisk
-                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
-                    \                   \n"
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
                 id: script.mass_media_play
                 name: Klassisk
                 type: script
               - data:
                   media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/folkemusikk
-                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
-                    \                   \n"
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
                 id: script.mass_media_play
                 name: NRK Folk
                 type: script
               - data:
                   media_id: https://lyd.nrk.no/icecast/mp3/high/s0w7hwn47m/jazz
-                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
-                    \                   \n"
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
                 id: script.mass_media_play
                 name: NRK Jazz
                 type: script
               - data:
                   media_id: BBC Radio 4
-                  media_player_entity_id: "[[[ return variables.entity_id; ]]]   \
-                    \                   \n"
+                  media_player_entity_id: |
+                    [[[ return variables.entity_id; ]]]                      
                 id: script.mass_media_play
                 name: Radio 4
                 type: script
@@ -224,12 +229,16 @@ button_card_templates:
       entity_id: media_player.soverom_hoyttaler
   personcard:
     custom_fields:
-      battery: "[[[          \n let icon = states[variables.battery_entity].attributes?.icon;\
-        \          \n return `<ha-icon icon=\"${icon}\" style=\"width:10px;\"></ha-icon>\
-        \ ${states[variables.battery_entity].state}%`;\n ]]]\n"
-      steps: "[[[          \n let icon = states[variables.steps_entity].attributes?.icon;\
-        \          \n return `<ha-icon icon=\"${icon}\" style=\"width:10px;\"></ha-icon>\
-        \ ${states[variables.steps_entity].state}`;\n ]]]\n"
+      battery: |
+        [[[          
+         let icon = states[variables.battery_entity].attributes?.icon;          
+         return `<ha-icon icon="${icon}" style="width:10px;"></ha-icon> ${states[variables.battery_entity].state}%`;
+         ]]]
+      steps: |
+        [[[          
+         let icon = states[variables.steps_entity].attributes?.icon;          
+         return `<ha-icon icon="${icon}" style="width:10px;"></ha-icon> ${states[variables.steps_entity].state}`;
+         ]]]
     styles:
       battery:
         - grid-area: 1 / 3 / 2 / 4;
@@ -249,41 +258,61 @@ button_card_templates:
         - gap: 2px 2px
       i:
         - grid-area: 1 / 2 / 2 / 3
-      n:
+      'n':
         - grid-area: 1 / 3 / 2 / 4;
       name:
         - font-size: 10px
         - text-align: left
     tap_action:
       action: navigate
-      navigation_path: "[[[\n  return variables.navhash;\n]]]  \n"
+      navigation_path: |
+        [[[
+          return variables.navhash;
+        ]]]  
     variables:
       battery_entity: null
       steps_entity: null
   ratescard:
     custom_fields:
-      rates: "[[[\n  let test = states['binary_sensor.octopus_energy_target_nightly_lux_charge'];\n\
-        \n  let element = states['event.octopus_energy_electricity_18p2053324_1414550002006_current_day_rates'];\n\
-        \  let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];\n\
-        \  let maxRate = element.attributes.max_rate;\n  let minRate = element.attributes.min_rate;\n\
-        \n  let output = \"<table>\";\n  let graph = \"<div style=\\\"width:100%;\
-        \ background-color:none\\\">\";\n  element.attributes.rates.forEach((elem)\
-        \ => {\n\n    let dateParsed = new Date(Date.parse(elem.start)); \n\n    if\
-        \ (dateParsed > new Date()) {\n      let dateParsedStr = dateParsed.getHours()\
-        \ + \":\" + String(dateParsed.getMinutes()).padStart(2,\"0\");           \
-        \ \n      let startDate = dateParsed.toLocaleTimeString().slice(0,-3);\n \
-        \     let rateValue = parseFloat(elem.value_inc_vat*100).toFixed(2);\n   \
-        \   let ratePerc = ((elem.value_inc_vat / maxRate)*95);\n      if (ratePerc\
-        \ < 10) { ratePerc = 50; }\n      let startColor = 'rgba(40,50,80,0.9)';\n\
-        \      let endColor = 'rgb(1,100,1)';\n      if (rateValue > 20) { endColor\
-        \ = 'rgb(100,100,1)'; } \n      if (rateValue > 30) { endColor = 'rgb(200,50,1)';\
-        \ } \n      let rowColor = `linear-gradient(to right,${startColor} 1%,${endColor}\
-        \ 50%, ${endColor})`\n      graph = graph + `<div style='padding-left:2px;padding-right:5px;background:${rowColor};text-align:left;\
-        \ width:${ratePerc}%;'>\n      <span style='text-align:left'>${dateParsedStr}</span><span\
-        \ style='float:right;'>${rateValue}p</span>\n      </div>`;\n      output\
-        \ = output + `<tr><td>${startDate}</td><td>${rateValue}</td><td>${ratePerc}</td></tr>`;\n\
-        \    }\n  });\n  graph = graph + \"</div>\";\n  output = output + \"</table>\"\
-        ;\n\n\n  return `<div>${graph}</div>`;\n\n]]]\n"
+      rates: |
+        [[[
+          let test = states['binary_sensor.octopus_energy_target_nightly_lux_charge'];
+
+          let element = states['event.octopus_energy_electricity_18p2053324_1414550002006_current_day_rates'];
+          let elementTomorrow = states['event.octopus_energy_electricity_18p2053324_1414550002006_next_day_rates'];
+          let maxRate = element.attributes.max_rate;
+          let minRate = element.attributes.min_rate;
+
+          let output = "<table>";
+          let graph = "<div style=\"width:100%; background-color:none\">";
+          element.attributes.rates.forEach((elem) => {
+
+            let dateParsed = new Date(Date.parse(elem.start)); 
+
+            if (dateParsed > new Date()) {
+              let dateParsedStr = dateParsed.getHours() + ":" + String(dateParsed.getMinutes()).padStart(2,"0");            
+              let startDate = dateParsed.toLocaleTimeString().slice(0,-3);
+              let rateValue = parseFloat(elem.value_inc_vat*100).toFixed(2);
+              let ratePerc = ((elem.value_inc_vat / maxRate)*95);
+              if (ratePerc < 10) { ratePerc = 50; }
+              let startColor = 'rgba(40,50,80,0.9)';
+              let endColor = 'rgb(1,100,1)';
+              if (rateValue > 20) { endColor = 'rgb(100,100,1)'; } 
+              if (rateValue > 30) { endColor = 'rgb(200,50,1)'; } 
+              let rowColor = `linear-gradient(to right,${startColor} 1%,${endColor} 50%, ${endColor})`
+              graph = graph + `<div style='padding-left:2px;padding-right:5px;background:${rowColor};text-align:left; width:${ratePerc}%;'>
+              <span style='text-align:left'>${dateParsedStr}</span><span style='float:right;'>${rateValue}p</span>
+              </div>`;
+              output = output + `<tr><td>${startDate}</td><td>${rateValue}</td><td>${ratePerc}</td></tr>`;
+            }
+          });
+          graph = graph + "</div>";
+          output = output + "</table>";
+
+
+          return `<div>${graph}</div>`;
+
+        ]]]
     name: Import Rates
     styles:
       card:
@@ -337,34 +366,49 @@ button_card_templates:
       btn2:
         card:
           template: roomcardnav
-          triggers_update: "[[[ return variables.btn2_onoff; ]]]          \n"
+          triggers_update: |
+            [[[ return variables.btn2_onoff; ]]]          
           type: custom:button-card
           variables:
-            icon: "[[[ return variables.btn2_icon; ]]]                           \
-              \   \n"
+            icon: |
+              [[[ return variables.btn2_icon; ]]]                              
             navhash: |
               [[[ return variables.btn2_hash; ]]]
-            onoff: "[[[ return variables.btn2_onoff; ]]]          \n"
-      infospan: "[[[\n  let content = '';\n  let tText = `${states[variables.temperature_entity].state}`;\
-        \          \n  if (tText == 'unavailable') { tText = ''; }\n  let tColor =\
-        \ 'rgba(200,200,180,0.5)';\n  if (Number(tText) < 15) { tColor = 'rgba(100,200,255,0.8)';\
-        \ }\n  if (Number(tText) > 18) { tColor = 'rgba(255,200,100,0.8)'; }\n  if\
-        \ (Number(tText) > 20) { tColor = 'rgba(255,100,100,0.9)'; }\n\n\n  content\
-        \ = content + `<span style=\"color: ${tColor}\"><ha-icon icon=\"mdi:thermometer\"\
-        \ style=\"width: 12px; height: 12px;\"></ha-icon>${tText}</span>`;\n\n\n \
-        \ let fText = `${states[variables.humidity_entity].state}`;          \n  if\
-        \ (fText == 'unavailable') { fText = ''; }\n  let fColor = 'rgba(200,200,180,0.5)';\
-        \          \n  if (Number(fText) > 70) { fColor = 'rgba(100,200,255,0.9)';\
-        \ }\n  if (Number(fText) > 80) { fColor = 'rgba(0,0,255,1.0)'; }\n\n\n  content\
-        \ = content + `<br/><span style=\"color:${fColor}\"><ha-icon icon=\"mdi:water-percent\"\
-        \ style=\"width: 12px; height: 12px;\"></ha-icon>${fText}</span>`\n  let text\
-        \ = \"\";\n  if (variables.media_entity) {\n    console.log(\"media entity\"\
-        , states[variables.media_entity]);\n    if (states[variables.media_entity].attributes\
-        \ && states[variables.media_entity].attributes?.media_title) {\n      text\
-        \ = states[variables.media_entity].attributes?.media_title;\n      content\
-        \ = content + `<br/><div style=\"font-size: 0.8em;\"><marquee behavior=scroll\
-        \ scrollamount=1>${text}</marquee></div>`;\n    }\n  }\n\n  return content;\n\
-        ]]]\n"
+            onoff: |
+              [[[ return variables.btn2_onoff; ]]]          
+      infospan: |
+        [[[
+          let content = '';
+          let tText = `${states[variables.temperature_entity].state}`;          
+          if (tText == 'unavailable') { tText = ''; }
+          let tColor = 'rgba(200,200,180,0.5)';
+          if (Number(tText) < 15) { tColor = 'rgba(100,200,255,0.8)'; }
+          if (Number(tText) > 18) { tColor = 'rgba(255,200,100,0.8)'; }
+          if (Number(tText) > 20) { tColor = 'rgba(255,100,100,0.9)'; }
+
+
+          content = content + `<span style="color: ${tColor}"><ha-icon icon="mdi:thermometer" style="width: 12px; height: 12px;"></ha-icon>${tText}</span>`;
+
+
+          let fText = `${states[variables.humidity_entity].state}`;          
+          if (fText == 'unavailable') { fText = ''; }
+          let fColor = 'rgba(200,200,180,0.5)';          
+          if (Number(fText) > 70) { fColor = 'rgba(100,200,255,0.9)'; }
+          if (Number(fText) > 80) { fColor = 'rgba(0,0,255,1.0)'; }
+
+
+          content = content + `<br/><span style="color:${fColor}"><ha-icon icon="mdi:water-percent" style="width: 12px; height: 12px;"></ha-icon>${fText}</span>`
+          let text = "";
+          if (variables.media_entity) {
+            console.log("media entity", states[variables.media_entity]);
+            if (states[variables.media_entity].attributes && states[variables.media_entity].attributes?.media_title) {
+              text = states[variables.media_entity].attributes?.media_title;
+              content = content + `<br/><div style="font-size: 0.8em;"><marquee behavior=scroll scrollamount=1>${text}</marquee></div>`;
+            }
+          }
+
+          return content;
+        ]]]
     group_expand: true
     styles:
       card:
@@ -404,48 +448,68 @@ button_card_templates:
           - color: rgba(200,200,200,0.8);
           - text-shadow: 1px 1px 1px rgba(5,5,5,0.4)
       grid:
-        - grid-template-areas: '"n n n" "infospan infospan btn1" "infospan infospan
-            btn2" "i blank btn2"'
+        - grid-template-areas: >-
+            "n n n" "infospan infospan btn1" "infospan infospan btn2" "i blank
+            btn2"
         - grid-template-columns: 0.8fr 1fr 0.8fr
         - grid-template-rows: 0.8fr 0.5fr 0.5fr 0.8fr
         - border-radius: 20px
         - margin: 5px
         - padding-right: 5px
-        - box-shadow: "[[[\n  function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}\
-            \                                                                    \n\
-            \  let output = \"4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.78);\"        \
-            \      \n  let output2 = `4px 4px 2px 3px  hsl(0deg 0% 0% / 0.38), 3px\
-            \ 3px 8px 3px  ${variables.roomcolor.slice(0, -2)}0.5)`;             \
-            \ \n  return output2;\n  if (!variables.temperature_entity) { return output;\
-            \ }\n   let tVal = states[variables.temperature_entity]?.state;      \
-            \                          \n  let tValScaled = convertRange(tVal,[15,30],[120,0]);\n\
-            \  //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;  \
-            \                                        \n\n  return output2;  \n]]]\n"
-        - background: "[[[\n  function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}\n\
-            \n  let tempEntity = states[variables.temperature_entity];           \
-            \                               \n  let tVal = tempEntity.state;     \
-            \                           \n\n  if (tVal == 'unavailable') { tVal =\
-            \ 0; }\n\n  let humidEntity = states[variables.humidity_entity];     \
-            \         \n  let hVal = humidEntity.state;           \n  if (hVal ==\
-            \ 'unavailable') { hVal = 0; }\n  let tValScaled = convertRange(tVal,[15,30],[100,0]);\n\
-            \  let tempHsla = `hsla(${tValScaled},50%,50%,0.5)`;                 \
-            \                     \n  let hValScaled = convertRange(hVal,[50,100],[130,235])\
-            \              \n  let fuktHsla = `hsla(${hValScaled},10%,50%,0.5)`;\n\
-            \n  let roomHsla = tempHsla;\n  if (variables.roomcolor) {\n    roomHsla\
-            \ = variables.roomcolor;\n  }\n\n  let output3 = `                   \
-            \   \n  radial-gradient(at top left, ${roomHsla} 0%, transparent 50%),\n\
-            \  radial-gradient(at top right, ${roomHsla} 0%, transparent 50%),\n \
-            \ radial-gradient(at bottom right, ${roomHsla} 0%, transparent 50%), \
-            \                                                   \n  radial-gradient(at\
-            \ bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent\
-            \ 60%),\n  linear-gradient(0deg, transparent 0%, ${roomHsla} 50%, transparent\
-            \ 100%)\n  `;\n\n  return output3;\n]]]        \n"
+        - box-shadow: |
+            [[[
+              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}                                                                    
+              let output = "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.78);"              
+              let output2 = `4px 4px 2px 3px  hsl(0deg 0% 0% / 0.38), 3px 3px 8px 3px  ${variables.roomcolor.slice(0, -2)}0.5)`;              
+              return output2;
+              if (!variables.temperature_entity) { return output; }
+               let tVal = states[variables.temperature_entity]?.state;                                
+              let tValScaled = convertRange(tVal,[15,30],[120,0]);
+              //output = `4.0px 8.0px 8.0px hsla(${tValScaled},20%,20%,0.38)`;                                          
+
+              return output2;  
+            ]]]
+        - background: |
+            [[[
+              function convertRange(value,r1,r2) { return (value-r1[0])*(r2[1]-r2[0])/(r1[1]-r1[0])+r2[0];}
+
+              let tempEntity = states[variables.temperature_entity];                                          
+              let tVal = tempEntity.state;                                
+
+              if (tVal == 'unavailable') { tVal = 0; }
+
+              let humidEntity = states[variables.humidity_entity];              
+              let hVal = humidEntity.state;           
+              if (hVal == 'unavailable') { hVal = 0; }
+              let tValScaled = convertRange(tVal,[15,30],[100,0]);
+              let tempHsla = `hsla(${tValScaled},50%,50%,0.5)`;                                      
+              let hValScaled = convertRange(hVal,[50,100],[130,235])              
+              let fuktHsla = `hsla(${hValScaled},10%,50%,0.5)`;
+
+              let roomHsla = tempHsla;
+              if (variables.roomcolor) {
+                roomHsla = variables.roomcolor;
+              }
+
+              let output3 = `                      
+              radial-gradient(at top left, ${roomHsla} 0%, transparent 50%),
+              radial-gradient(at top right, ${roomHsla} 0%, transparent 50%),
+              radial-gradient(at bottom right, ${roomHsla} 0%, transparent 50%),                                                    
+              radial-gradient(at bottom left, ${roomHsla} 20%,${tempHsla} 30%, ${fuktHsla} 35%, transparent 60%),
+              linear-gradient(0deg, transparent 0%, ${roomHsla} 50%, transparent 100%)
+              `;
+
+              return output3;
+            ]]]        
       icon:
         - width: 40px
-        - color: "[[[\n  if (variables.motion_entity && states[variables.motion_entity]?.state\
-            \ == 'on') {                \n    return \"rgba(255,149,1,0.9)\";    \
-            \                                \n  }\n  return \"rgba(255,255,255,0.9)\"\
-            ;\n]]]\n"
+        - color: |
+            [[[
+              if (variables.motion_entity && states[variables.motion_entity]?.state == 'on') {                
+                return "rgba(255,149,1,0.9)";                                    
+              }
+              return "rgba(255,255,255,0.9)";
+            ]]]
         - opacity: '0.6'
       img_cell:
         - justify-content: start
@@ -527,16 +591,19 @@ button_card_templates:
         - border-radius: 20px
         - filter: drop-shadow(0 0 1.0rem rgb(243,156,15))
         - font-size: 10px
-        - background: |
-            [[[ if (states[variables.onoff]?.state == 'on' || variables.onoff == 'on') { return 'rgba(200,200,22,0.5)'; }
+        - background: >
+            [[[ if (states[variables.onoff]?.state == 'on' || variables.onoff ==
+            'on') { return 'rgba(200,200,22,0.5)'; }
               else { return 'rgba(20,20,20,0.2)'; }
             ]]]
       icon:
         - transform: scale(0.4)
         - font-size: 2px !important;
-        - color: "[[[ if (states[variables.onoff]?.state == 'on') { return 'rgba(30,30,30,0.95)';\
-            \ }\n  else { return 'rgba(20,20,20,0.5)'; }\n]]]                    \
-            \ \n"
+        - color: >
+            [[[ if (states[variables.onoff]?.state == 'on') { return
+            'rgba(30,30,30,0.95)'; }
+              else { return 'rgba(20,20,20,0.5)'; }
+            ]]]                     
     tap_action:
       action: navigate
       navigation_path: |
@@ -563,11 +630,16 @@ button_card_templates:
         card:
           entity: light.alle_lys
           icon: mdi:lightbulb
-          name: "[[[              \n  var entityIds = states['light.alle_lys']?.attributes?.entity_id;\
-            \              \n  var lightsOn = 0;\n  for (var i = 0; i < entityIds.length;\
-            \ i++) {\n    var lightState = states[entityIds[i]]?.state;\n    if (lightState\
-            \ == 'on') { lightsOn++; }                                          \n\
-            \  }\n  return `Lys (${lightsOn})`;\n]]]\n"
+          name: |
+            [[[              
+              var entityIds = states['light.alle_lys']?.attributes?.entity_id;              
+              var lightsOn = 0;
+              for (var i = 0; i < entityIds.length; i++) {
+                var lightState = states[entityIds[i]]?.state;
+                if (lightState == 'on') { lightsOn++; }                                          
+              }
+              return `Lys (${lightsOn})`;
+            ]]]
           show_state: false
           tap_action:
             action: navigate
@@ -664,18 +736,9 @@ button_card_templates:
 decluttering_templates:
   al-kamera:
     card:
-      digital_ptz:
-        mouse_double_click_zoom: true
-        mouse_drag_pan: true
-        mouse_wheel_zoom: true
-        persist: true
-        touch_drag_pan: true
-        touch_pinch_zoom: true
-        touch_tap_drag_zoom: true
-      muted: false
-      type: custom:webrtc-camera
-      ui: false
-      url: rtsp://homeass:homeass@192.168.1.166:554/stream1
+      type: picture-entity
+      entity: camera.192_168_1_165_2
+      camera_view: live
   al-media:
     card:
       template: mediacard
@@ -700,7 +763,7 @@ decluttering_templates:
   auto-lights:
     card:
       card:
-        columns: 2
+        columns: 1
         square: false
         type: grid
       card_param: cards
@@ -824,39 +887,10 @@ decluttering_templates:
   soverom-lys:
     card:
       cards:
-        - entity: light.senglys_light
-          layout: horizontal
-          show_brightness_control: true
-          show_color_control: false
-          type: custom:mushroom-light-card
-        - cards:
-            - entity: light.soveromlys_venstre
-              layout: horizontal
-              name: Venstre
-              show_brightness_control: true
-              show_color_control: false
-              type: custom:mushroom-light-card
-            - entity: light.soveromlys_hoyre
-              layout: horizontal
-              name: Høyre
-              show_brightness_control: true
-              show_color_control: false
-              type: custom:mushroom-light-card
-          columns: 2
-          square: false
-          type: grid
-        - entity: light.soverom_speil_2_light
-          layout: horizontal
-          name: Speil
-          show_brightness_control: true
-          show_color_control: false
-          type: custom:mushroom-light-card
-        - entity: light.soverom_lys_tak_1_light
-          layout: horizontal
-          name: Tak
-          show_brightness_control: true
-          show_color_control: false
-          type: custom:mushroom-light-card
+        - template: auto-lights
+          type: custom:decluttering-card
+          variables:
+            - area: Soverom
       type: vertical-stack
   soverom-media:
     card:
@@ -938,10 +972,12 @@ decluttering_templates:
             entity_id: media_player.piano_nest_hub
       type: vertical-stack
 views:
-  - background: radial-gradient(rgba(57,24,1,0.67) 0%, rgba(206,133,251,0) 100%),
-      linear-gradient(45deg, transparent 0%, rgba(38,87,0,0.61) 100%, rgba(127,176,6,0.51)
-      100%), linear-gradient(rgba(0,2,140,0.69) 0%, rgba(47,78,94,0.62) 100%), linear-gradient(154deg,
-      rgba(9,133,204,1) 0%, rgba(59,78,240,1) 100%)
+  - background: >-
+      radial-gradient(rgba(57,24,1,0.67) 0%, rgba(206,133,251,0) 100%),
+      linear-gradient(45deg, transparent 0%, rgba(38,87,0,0.61) 100%,
+      rgba(127,176,6,0.51) 100%), linear-gradient(rgba(0,2,140,0.69) 0%,
+      rgba(47,78,94,0.62) 100%), linear-gradient(154deg, rgba(9,133,204,1) 0%,
+      rgba(59,78,240,1) 100%)
     cards:
       - template: infocard
         type: custom:button-card
