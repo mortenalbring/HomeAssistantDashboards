@@ -736,15 +736,29 @@ button_card_templates:
 decluttering_templates:
   al-kamera:
     card:
-      type: picture-entity
-      entity: camera.192_168_1_165_2
-      camera_view: live
+      type: custom:frigate-card
+      cameras:
+        - camera_entity: camera.192_168_1_165_2
+          live_provider: ha
+      live:
+        auto_play:
+          - visible
+          - selected
+        preload: true
+        lazy_unload:
+          - hidden
+        show_image_during_load: false
+        controls:
+          builtin: false
+      view:
+        default: live
+        dark_mode: auto
   al-media:
     card:
       template: mediacard
       type: custom:button-card
       variables:
-        entity_id: media_player.beberom_hoyttaler
+        entity_id: media_player.beberom_ha
   all-lights-card:
     card:
       cards:
@@ -807,7 +821,7 @@ decluttering_templates:
         - template: mediacard
           type: custom:button-card
           variables:
-            entity_id: media_player.kjokken_hoyttaler_2
+            entity_id: media_player.kjokken_hoyttaler_4
       type: vertical-stack
   kontor-enheter:
     card:
@@ -898,7 +912,7 @@ decluttering_templates:
         - template: mediacard
           type: custom:button-card
           variables:
-            entity_id: media_player.soverom_hoyttaler_2
+            entity_id: media_player.soverom_hoyttaler
       type: vertical-stack
   spisestue-lys:
     card:
@@ -924,7 +938,7 @@ decluttering_templates:
         - template: mediacard
           type: custom:button-card
           variables:
-            entity_id: media_player.spisestue_nest_hub
+            entity_id: media_player.spisestue_nest_hub_3
       type: vertical-stack
   stue-lys:
     card:
