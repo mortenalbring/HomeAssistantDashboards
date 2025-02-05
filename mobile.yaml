@@ -407,6 +407,13 @@ button_card_templates:
             }
           }
           if (variables.climate_entity) {
+            let ctext = "";
+            if (states[variables.climate_entity].attributes?.percentage_demand) {              
+              content = content + `<br/><span style="color:lightgrey"><ha-icon icon="mdi:heating-coil" style="width: 12px; height: 12px;"></ha-icon> ${states[variables.climate_entity].attributes?.percentage_demand}%</span>`
+            }
+            
+            content = content + `<br/><div style="font-size: 0.8em;">${ctext}</div>`;
+          
             console.log("climate entity", states[variables.climate_entity]);
           
           }
@@ -566,6 +573,7 @@ button_card_templates:
       btn2_onoff: null
       card_area: null
       humidity_entity: null
+      co2_entity: null
       media_entity: null
       motion_entity: null
       other: |
@@ -1030,6 +1038,7 @@ views:
               btn1_onoff: media_player.kjokken_hoyttaler
               btn2_hash: '#kjokken-enheter'
               btn2_icon: mdi:devices
+              climate_entity: climate.wiser_kitchen
               humidity_entity: sensor.kjoekken_fuktighet
               media_entity: media_player.kjokken_hoyttaler
               motion_entity: binary_sensor.kjoekken_bevegelsessensor_occupancy
@@ -1051,6 +1060,7 @@ views:
               btn2_hash: '#soverom-media'
               btn2_icon: mdi:speaker
               humidity_entity: sensor.soverom_fuktighet
+              climate_entity: climate.wiser_bedroom
               name: Soverom
               room_hash: '#soverom-room'
               roomcolor: hsla(238, 50%, 50%, 1)
@@ -1090,6 +1100,7 @@ views:
               btn2_hash: '#stue-media'
               btn2_icon: mdi:speaker
               humidity_entity: sensor.awair_lr_humid
+              climate_entity: climate.wiser_living_room
               name: Stue
               room_hash: '#stue-room'
               roomcolor: hsla(104, 100%, 27%, 1)
@@ -1106,6 +1117,7 @@ views:
               btn1_hash: '#spisestue-lys'
               btn1_icon: mdi:lamp
               btn1_onoff: light.spisestue_lys
+              climate_entity: climate.wiser_dining_room
               btn2_hash: '#spisestue-media'
               btn2_icon: mdi:speaker
               humidity_entity: sensor.spisestue_presence_fuktighet
@@ -1474,20 +1486,19 @@ views:
             card_type: pop-up
             hash: '#garasje-room'
             icon: mdi:weight-lifter
+            type: custom:bubble-card            
+          
             name: Garasje
-            type: custom:bubble-card
-          - digital_ptz:
-              mouse_double_click_zoom: true
-              mouse_drag_pan: true
-              mouse_wheel_zoom: true
-              persist: true
-              touch_drag_pan: true
-              touch_pinch_zoom: true
-              touch_tap_drag_zoom: true
-            muted: false
-            type: custom:webrtc-camera
-            ui: false
-            url: rtsp://homeass:homeass@192.168.1.46:554/stream2
+          - type: picture-entity
+            show_state: true
+            show_name: true
+            camera_view: auto
+            entity: camera.192_168_1_46
+            
+            
+            
+          
+         
         type: vertical-stack
       - cards:
           - card_type: pop-up
@@ -1535,18 +1546,12 @@ views:
             icon: mdi:hand-saw
             name: Verksted
             type: custom:bubble-card
-          - digital_ptz:
-              mouse_double_click_zoom: true
-              mouse_drag_pan: true
-              mouse_wheel_zoom: true
-              persist: true
-              touch_drag_pan: true
-              touch_pinch_zoom: true
-              touch_tap_drag_zoom: true
-            muted: false
-            type: custom:webrtc-camera
-            ui: false
-            url: rtsp://homeass:homeass@192.168.1.47:554/stream1
+          - type: picture-entity
+            show_state: true
+            show_name: true
+            camera_view: auto
+            entity: camera.verksted_kamera
+
           - entities:
               - light.verksted_lys
               - sensor.verksted_fuktighet
@@ -1641,6 +1646,7 @@ views:
             type: custom:button-card
             variables:
               humidity_entity: sensor.baderom_fuktighet
+              
               roomcolor: hsla(189, 66%, 52%, 1)
               temperature_entity: sensor.baderom_temperatur
         columns: 3
