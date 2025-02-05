@@ -109,7 +109,7 @@ button_card_templates:
           variables:
             battery_entity: sensor.pixel_8_pro_battery_level
             navhash: '#morten-card'
-            steps_entity: sensor.pixel_8_pro_daily_steps
+            steps_entity: sensor.pixel_8_pro_steps_sensor
       naomi:
         card:
           entity: person.naomi
@@ -406,6 +406,10 @@ button_card_templates:
               content = content + `<br/><div style="font-size: 0.8em;"><marquee behavior=scroll scrollamount=1>${text}</marquee></div>`;
             }
           }
+          if (variables.climate_entity) {
+            console.log("climate entity", states[variables.climate_entity]);
+          
+          }
 
           return content;
         ]]]
@@ -555,6 +559,7 @@ button_card_templates:
           return variables.room_hash;
         ]]]
     variables:
+      climate_entity: null
       btn1_hash: null
       btn1_onoff: null
       btn2_hash: null
@@ -800,9 +805,6 @@ decluttering_templates:
   kjokken-enheter:
     card:
       cards:
-        - entities:
-            - entity: sensor.kjoleskap_temperatur
-          type: history-graph
         - cards:
             - entities:
                 - entity: sensor.sm_n960f_battery_level
@@ -837,6 +839,9 @@ decluttering_templates:
               - entity: button.grace_grace_mediaplaypause
               - entity: sensor.database_free_space_days_remaining
               - entity: sensor.database_size_growth_daily_last_period
+              - entity: sensor.kontor_presence_one_co2
+              - entity: binary_sensor.kontor_presence_one_pir
+              - entity: binary_sensor.kontor_presence_one_mmwave
             type: entities
           conditions:
             - condition: user
@@ -1103,11 +1108,11 @@ views:
               btn1_onoff: light.spisestue_lys
               btn2_hash: '#spisestue-media'
               btn2_icon: mdi:speaker
-              humidity_entity: sensor.gjallarhorn_humidity
+              humidity_entity: sensor.spisestue_presence_fuktighet
               motion_entity: binary_sensor.spisestue_any
               room_hash: '#spisestue-room'
               roomcolor: hsla(260, 100%, 57%, 1)
-              temperature_entity: sensor.gjallarhorn_temperature
+              temperature_entity: sensor.spisestue_presence_temperatur
         columns: 2
         type: horizontal-stack
       - cards:
@@ -1124,6 +1129,8 @@ views:
             type: custom:bubble-card
           - template: kjokken-media
             type: custom:decluttering-card
+          - type: thermostat
+            entity: climate.wiser_kitchen
           - template: kjokken-enheter
             type: custom:decluttering-card
         type: vertical-stack
@@ -1282,6 +1289,8 @@ views:
             type: custom:decluttering-card
           - template: soverom-lys
             type: custom:decluttering-card
+          - type: thermostat
+            entity: climate.wiser_bedroom
         type: vertical-stack
       - cards:
           - button_type: state
@@ -1413,6 +1422,14 @@ views:
                 icon_color: amber
                 type: entity
             type: custom:mushroom-chips-card
+          - type: entities
+            entities:
+              - entity: sensor.stue_bevegelsessensor_humidity
+              - entity: sensor.stue_bevegelsessensor_illuminance
+              - entity: sensor.stue_bevegelsessensor_temperature
+              - entity: binary_sensor.stue_bevegelsessensor_pir
+              - entity: binary_sensor.stue_bevegelsessensor_mmwave
+              - entity: binary_sensor.stue_bevegelsessensor_occupancy
         type: vertical-stack
       - cards:
           - button_type: state
@@ -1449,6 +1466,8 @@ views:
             type: custom:decluttering-card
           - template: spisestue-media
             type: custom:decluttering-card
+          - type: thermostat
+            entity: climate.wiser_dining_room
         type: vertical-stack
       - cards:
           - card_layout: large
